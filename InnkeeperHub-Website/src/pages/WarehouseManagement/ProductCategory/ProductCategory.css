@@ -1,0 +1,333 @@
+/* ===== TỔNG THỂ BOX TRẮNG ===== */
+.cat-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.cat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cat-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a1f36;
+  flex-shrink: 0;
+}
+
+/* Nhóm controls bên phải header */
+.cat-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.cat-header-controls .search-box {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.btn-add-green {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add-green:hover { background-color: #45a049; }
+
+/* ===== KHU VỰC CHIA ĐÔI MÀN HÌNH ===== */
+.cat-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- BÊN TRÁI: DANH SÁCH & TÌM KIẾM --- */
+.cat-sidebar {
+  width: 350px; /* Thu gọn vừa phải cho Danh mục */
+  background-color: #fafbfc;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-controls {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-box i {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  font-size: 18px;
+}
+.search-box input {
+  width: 100%;
+  padding: 10px 10px 10px 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-box input:focus { border-color: #00A4D3; }
+
+/* Danh sách Item */
+.cat-list-wrapper {
+  flex: 1;
+  overflow-y: auto;
+}
+.cat-list-wrapper::-webkit-scrollbar, .cat-content::-webkit-scrollbar { width: 6px; }
+.cat-list-wrapper::-webkit-scrollbar-thumb, .cat-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.cat-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.cat-item:hover { background-color: #f1f5f9; }
+.cat-item.active {
+  background-color: #e0f2fe;
+  border-left: 4px solid #00A4D3;
+}
+
+.cat-name {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.cat-desc {
+  font-size: 13px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- BÊN PHẢI: FORM CHI TIẾT --- */
+.cat-content {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #94a3b8;
+  gap: 16px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.form-title { font-size: 24px; font-weight: 700; color: #0f172a; margin: 0; }
+
+.form-actions { display: flex; gap: 12px; }
+
+/* Nút hành động chữ nhật */
+.btn-action-text {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-action-text.edit { background-color: #f59e0b; color: white; border: none; }
+.btn-action-text.edit:hover { background-color: #d97706; }
+.btn-action-text.delete { background-color: #fff5f5; color: #ef4444; border: 1px solid #fecaca; }
+.btn-action-text.delete:hover { background-color: #fee2e2; }
+
+/* Nút Primary (Màu xanh dương) */
+.btn-primary {
+  background: #00A4D3;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.btn-primary:hover { 
+  background: #008eb8; 
+}
+
+.btn-cancel {
+  background: #f1f3f5;
+  color: #495057;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-cancel:hover { background: #e2e6ea; }
+
+/* ===== MODAL ACTIONS ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  text-align: center;
+}
+
+.modal-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lưới Input */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Danh mục chỉ cần 1 cột là đẹp nhất */
+  gap: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.input-group input, .input-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  transition: all 0.2s;
+  outline: none;
+  font-family: inherit;
+}
+.input-group input:focus, .input-group textarea:focus {
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.1);
+}
+.input-group input:disabled, .input-group textarea:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: transparent;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 6px;
+  display: block;
+}
+.input-error { border-color: #ef4444 !important; }
+
+/* ========================================================
+   ===== TỐI ƯU RESPONSIVE (GẬP MÀN HÌNH) =====
+   ======================================================== */
+
+@media (max-width: 992px) {
+  .cat-body { flex-direction: column; }
+
+  .cat-sidebar {
+    width: 100%;
+    height: 35vh; 
+    border-right: none;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .cat-header, .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .cat-header-controls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .cat-header-controls .search-box { width: 100%; }
+  .cat-header-controls button { width: 100%; justify-content: center; }
+  .cat-content { padding: 24px 20px; }
+}
+
+@media (max-width: 768px) {
+  .form-actions { width: 100%; flex-wrap: wrap; }
+  .form-actions button { flex: 1; white-space: nowrap; justify-content: center; }
+}

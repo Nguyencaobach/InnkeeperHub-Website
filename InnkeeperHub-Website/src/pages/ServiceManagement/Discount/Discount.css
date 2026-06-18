@@ -1,0 +1,475 @@
+/* ===== TỔNG THỂ BOX TRẮNG ===== */
+.discount-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.ds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ds-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a1f36;
+}
+
+.btn-add-green {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-green:hover {
+  background-color: #45a049;
+}
+
+.btn-add-green:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ===== KHU VỰC CHIA ĐÔI MÀN HÌNH ===== */
+.ds-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- BÊN TRÁI: DANH SÁCH --- */
+.ds-sidebar {
+  width: 400px;
+  /* Nhỏ hơn RoomType một chút vì data ít hơn */
+  background-color: #fafbfc;
+  border-right: 1px solid #f0f0f0;
+  overflow-y: auto;
+}
+
+.ds-sidebar::-webkit-scrollbar,
+.ds-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ds-sidebar::-webkit-scrollbar-thumb,
+.ds-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.discount-item {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.discount-item:hover {
+  background-color: #f1f5f9;
+}
+
+.discount-item.active {
+  background-color: #e0f2fe;
+  border-left: 4px solid #00A4D3;
+}
+
+.discount-code {
+  font-weight: 800;
+  color: #1e293b;
+  font-size: 18px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.discount-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+/* Số tiền giảm màu đỏ */
+.discount-dates {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.badge-active {
+  background: #dcfce7;
+  color: #166534;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* --- BÊN PHẢI: FORM CHI TIẾT --- */
+.ds-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #94a3b8;
+  gap: 16px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Các nút trong form */
+.btn-outline {
+  background: white;
+  border: 1px solid #cbd5e1;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #f8fafc;
+}
+
+.btn-outline:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #00A4D3;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #008eb8;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-danger {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #fee2e2;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Lưới Input */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.input-group label {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"],
+.input-group input[type="datetime-local"],
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #1e293b;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.input-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.1);
+}
+
+.input-group input:disabled,
+.input-group textarea:disabled,
+.input-group select:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 6px;
+  display: block;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+/* ===== KHOẢNG NGÀY GIỜ (2 ô bên nhau, đủ chỗ hiện giờ) ===== */
+.ds-date-row {
+  display: flex;
+  gap: 20px;
+}
+
+.ds-date-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-date-field label {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.ds-date-field input[type="datetime-local"] {
+  width: 100%;
+  min-width: 230px;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.ds-date-field input[type="datetime-local"]:focus {
+  outline: none;
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.1);
+}
+
+.ds-date-field input[type="datetime-local"]:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.modal-icon.success i {
+  color: #10b981;
+}
+
+/* ========================================================
+   ===== TỐI ƯU RESPONSIVE (GẬP MÀN HÌNH) =====
+   ======================================================== */
+
+@media (max-width: 992px) {
+
+  /* 1. Gập dọc màn hình: Danh sách trên, Form dưới */
+  .ds-body {
+    flex-direction: column;
+  }
+
+  /* 2. Danh sách: Chiếm 100% ngang, giới hạn chiều cao 35vh để cuộn */
+  .ds-sidebar {
+    width: 100%;
+    height: 35vh;
+    border-right: none;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  /* 3. Header & Form: Căn chỉnh lại khoảng cách */
+  .ds-header,
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .ds-header button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ds-content {
+    padding: 24px 20px;
+  }
+
+  /* Lưới 2 cột -> 1 cột */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Cụm nút hành động dàn đều */
+  .form-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .form-actions button {
+    flex: 1;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* Danh sách mã giảm giá chiều cao nhỏ hơn trên mobile */
+  .ds-sidebar {
+    height: 30vh;
+  }
+
+  /* Header thu nhỏ chữ */
+  .ds-header h2 {
+    font-size: 18px;
+  }
+
+  /* 2 ô ngày giờ gập dọc */
+  .ds-date-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ds-date-field input[type="datetime-local"] {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .discount-code {
+    font-size: 15px;
+  }
+
+  .discount-amount {
+    font-size: 13px;
+  }
+
+  .discount-dates {
+    font-size: 12px;
+  }
+
+  .ds-content {
+    padding: 16px 14px;
+  }
+}
+
+/* ===================================================
+   ẨN PHẦN SA/CH TRONG Ô NHẬP NGÀY GIỜ
+   Ép hiển thị kiểu 24h (00:00 → 23:59) thay vì SA/CH
+   =================================================== */
+
+/* Ẩn phần AM/PM trong tất cả các ô datetime-local */
+input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
+  display: none;
+}
+
+/* Ép giờ hiển thị theo kiểu 24h (hh: 00-23 thay vì 01-12) */
+input[type="datetime-local"]::-webkit-datetime-edit-hour-field {
+  /* Trình duyệt tự chuyển sang 24h khi AM/PM bị ẩn */
+}

@@ -1,0 +1,763 @@
+/* ─────────────────────────────────────────────────────────────────
+   ViewBooking.css
+   CSS bổ sung cho trang Xem Phiên Thuê — kết hợp với CreateBooking.css
+   ───────────────────────────────────────────────────────────────── */
+
+/* ════ TRANG DỊCH VỤ THÊM ═══════════════════════════════════════ */
+.vb-services-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* ════ TAB SYSTEM ════════════════════════════════════════════════ */
+
+/* Override layout form-body: hai card cao bằng nhau */
+.cb-page .cb-form-body {
+  align-items: stretch;
+}
+
+/* Cả hai card đều stretch theo chiều cao lớn nhất */
+.cb-page .cb-card {
+  min-height: 560px;
+}
+
+/* Tăng kích thước ảnh CCCD để dễ xem hơn */
+.cb-page .cb-cccd-preview {
+  height: 150px;
+}
+
+.vb-tab-card {
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vb-tab-bar {
+  display: flex;
+  border-bottom: 2px solid #e8edf4;
+  background: #f8fafc;
+  padding: 0 4px;
+  gap: 2px;
+  border-radius: 14px 14px 0 0;
+  flex-shrink: 0;
+}
+
+.vb-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  border-radius: 10px 10px 0 0;
+  white-space: nowrap;
+  flex: 1;
+  justify-content: center;
+}
+
+.vb-tab-btn i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.vb-tab-btn:hover:not(.vb-tab-btn--active) {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.vb-tab-btn--active {
+  color: #00a4d3;
+  border-bottom-color: #00a4d3;
+  background: #fff;
+}
+
+/* Content area giống cb-card thường (padding 24px, gap 18px) */
+.vb-tab-content {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: vb-tab-fadein 0.2s ease;
+}
+
+@keyframes vb-tab-fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Empty state cho tab chưa có nội dung */
+.vb-tab-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.vb-tab-empty-icon {
+  font-size: 44px;
+  color: #cbd5e1;
+}
+
+.vb-tab-empty-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.vb-tab-empty-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #b0bec8;
+  font-style: italic;
+}
+
+/* ════ BILLING TAB ══════════════════════════════════════════════ */
+.vb-billing {
+  gap: 14px !important;
+}
+
+/* ─ Section (label + field box) ─ */
+.vb-bill-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vb-bill-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ─ Field Box (dạng ô readonly) ─ */
+.vb-bill-field-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+/* Căn giữa (dùng cho loại hình + đơn giá) */
+.vb-bill-field-box--center {
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Ô thời gian: có mũi tên real → billed */
+.vb-bill-field-box--time {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vb-bill-time-real {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.vb-bill-time-sep {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.vb-bill-time-billed {
+  color: #0284c7;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Ô công thức */
+.vb-bill-field-box--formula {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vb-bill-op {
+  font-size: 15px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.vb-bill-formula-result {
+  font-weight: 800;
+  color: #0284c7;
+}
+
+/* Ô gộp: công thức nhỏ trên + tổng tiền to dưới */
+.vb-bill-field-box--combined {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.vb-bill-formula-line {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.vb-bill-total-line {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ef4444;
+  line-height: 1.2;
+}
+
+/* ─ Row 2 cột (loại hình + đơn giá) ─ */
+.vb-bill-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ─ Duration Card ─ */
+.vb-bill-duration-card {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+}
+
+.vb-bill-duration-icon {
+  display: none;
+}
+
+.vb-bill-duration-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.vb-bill-duration-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.vb-bill-duration-display {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.vb-bill-dur-num {
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.vb-bill-dur-unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.vb-bill-dur-sep {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 2px;
+}
+
+.vb-bill-duration-since {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+}
+
+/* ─ Info Row (loại hình + giá) ─ */
+.vb-bill-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vb-bill-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e8edf5;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.vb-bill-info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Variant badge theo loại hình */
+.vb-rent-badge--hourly {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.vb-rent-badge--daily {
+  background: #fef3c7;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.vb-bill-unit-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.vb-bill-unit-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ─ Công thức tính ─ */
+.vb-bill-calc-row {
+  background: #f1f5f9;
+  border-radius: 9px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vb-bill-calc-formula {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.vb-bill-calc-op {
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.vb-bill-calc-note {
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ─ Total Card (gộp công thức + kết quả) ─ */
+.vb-bill-total-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #fef9f9;
+  border: 1.5px solid #fecaca;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.vb-bill-total-formula {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.vb-bill-total-label {
+  display: none;
+}
+
+.vb-bill-total-amount {
+  font-size: 26px;
+  font-weight: 800;
+  color: #dc2626;
+  line-height: 1.1;
+}
+
+.vb-bill-total-note {
+  font-size: 11px;
+  color: #f87171;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* ════ HEADER ════════════════════════════════════════════════════ */
+.vb-header-text-grow {
+  flex: 1;
+}
+
+/* ════ NÚT CHỈNH SỬA (header) ══════════════════════════════════ */
+.vb-btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+/* Trạng thái mặc định — màu cam giống mẫu */
+.vb-btn-edit--active {
+  border: none;
+  background: #f59e0b;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.vb-btn-edit--active:hover:not(:disabled) {
+  background: #d97706;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.vb-btn-edit--active:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.vb-btn-edit--cancel {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.vb-btn-edit--cancel:hover:not(:disabled) {
+  background: #e2e8f0;
+  border-color: #64748b;
+  color: #1e293b;
+  box-shadow: none;
+}
+
+.vb-btn-edit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ════ INPUT READONLY ════════════════════════════════════════════ */
+.vb-input-readonly {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+  cursor: default !important;
+  user-select: text;
+}
+
+.vb-input-readonly:focus {
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+/* Datetime readonly */
+.vb-dt-time-readonly {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ════ RENT TYPE BADGE (chế độ xem) ═════════════════════════════ */
+.vb-rent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #e8f7fb;
+  color: #007fa3;
+  border: 1px solid #b2e3f0;
+}
+
+/* ════ THÔNG TIN CHECK-IN THỰC TẾ ══════════════════════════════ */
+.vb-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9px;
+  margin-top: 4px;
+}
+
+.vb-info-icon {
+  font-size: 17px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.vb-info-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.vb-info-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+  margin-left: auto;
+}
+
+/* ════ CCCD NOTE ════════════════════════════════════════════════ */
+.vb-cccd-note {
+  color: #64748b;
+  font-style: italic;
+}
+
+/* ════ NÚT THANH TOÁN & TRẢ PHÒNG ══════════════════════════════ */
+.vb-btn-checkout {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+.vb-btn-checkout:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+
+.vb-btn-checkout:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.vb-btn-checkout:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Kích thước nhỏ hơn khi dùng trong modal */
+.vb-btn-checkout--sm {
+  width: auto;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+/* ════ EDIT HINT (khi edit nhưng chưa thay đổi) ════════════════ */
+.vb-edit-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ════ MODAL ════════════════════════════════════════════════════ */
+.vb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: vb-overlay-in 0.18s ease;
+}
+
+@keyframes vb-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.vb-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px 28px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: vb-modal-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes vb-modal-in {
+  from { opacity: 0; transform: scale(0.88) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.vb-modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.vb-modal-icon--save {
+  background: #e8f7fb;
+  color: #00a4d3;
+  border: 2px solid #b2e3f0;
+}
+
+.vb-modal-icon--checkout {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 2px solid #fecaca;
+}
+
+.vb-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1f36;
+  text-align: center;
+}
+
+.vb-modal-desc {
+  margin: 0;
+  font-size: 14px;
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.vb-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ════ LOADING / ERROR ══════════════════════════════════════════ */
+.vb-loading-wrap,
+.vb-error-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.vb-loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #00a4d3;
+  border-radius: 50%;
+  animation: vb-spin 0.8s linear infinite;
+}
+
+@keyframes vb-spin {
+  to { transform: rotate(360deg); }
+}
+
+.vb-error-wrap i {
+  font-size: 52px;
+  color: #ef4444;
+}
+
+/* ════ RESPONSIVE ════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .vb-btn-edit {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .vb-modal {
+    padding: 24px 20px 22px;
+  }
+
+  .vb-modal-actions {
+    flex-direction: column;
+  }
+
+  .vb-btn-checkout--sm {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ════ TOAST THÔNG BÁO ══════════════════════════════════════════ */
+.vb-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  z-index: 1100;
+  animation: vb-toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vb-toast--success {
+  background: #166534;
+  color: #fff;
+  border: 1px solid #15803d;
+}
+
+.vb-toast i {
+  font-size: 20px;
+}
+
+@keyframes vb-toast-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

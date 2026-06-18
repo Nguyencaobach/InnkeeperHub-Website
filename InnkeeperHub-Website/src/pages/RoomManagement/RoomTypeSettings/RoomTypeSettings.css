@@ -1,0 +1,646 @@
+/* ===== TỔNG THỂ BOX TRẮNG ===== */
+.room-settings-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.rs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rs-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a1f36;
+}
+
+/* Nút thêm mới màu xanh lá */
+.btn-add-green {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add-green:hover {
+  background-color: #45a049;
+}
+
+/* ===== KHU VỰC GRID CARD ===== */
+.rs-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+  background-color: #f8fafc;
+}
+
+/* Grid các card loại phòng */
+.room-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Từng card */
+.room-type-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-type-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+/* Ảnh card */
+.card-img-wrapper {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.room-type-card:hover .card-img {
+  transform: scale(1.05);
+}
+
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  font-size: 48px;
+}
+
+/* Body card */
+.card-body {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.card-meta i {
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+/* Giá trong card */
+.card-prices {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.card-price-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.price-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.card-price-item.hourly .price-value {
+  color: #00A4D3;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.card-price-item.daily .price-value {
+  color: #d97706;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Trạng thái trống */
+.empty-state-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #94a3b8;
+  gap: 12px;
+}
+
+.empty-state-grid h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #64748b;
+}
+
+.empty-state-grid p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ===== DETAIL VIEW (khi click card) ===== */
+.rs-detail-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rs-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+  flex-wrap: nowrap;
+  gap: 16px;
+}
+
+.rs-detail-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.rs-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+  background: #ffffff;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #94a3b8;
+  gap: 16px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Các nút trong form */
+.btn-outline {
+  background: white;
+  border: 1px solid #cbd5e1;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-outline:hover {
+  background: #f8fafc;
+}
+
+.btn-primary {
+  background: #00A4D3;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  background: #008eb8;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-danger {
+  background-color: #fff5f5;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  background-color: #fee2e2;
+}
+
+/* Lưới Input - 2 cột */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.two-thirds {
+  grid-column: span 2;
+}
+
+/* 2 ô giá luôn nằm cạnh nhau */
+.price-inputs-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.price-input-col label {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.price-input-col input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #1e293b;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.price-input-col input:focus {
+  outline: none;
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.1);
+}
+
+.price-input-col input:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.price-input-col input.input-error {
+  border-color: #ef4444 !important;
+}
+
+.input-group label {
+  display: block;
+  font-size: 15px;
+  /* Label to hơn */
+  font-weight: 600;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"] {
+  width: 100%;
+  padding: 12px 16px;
+  /* Ô nhập liệu to hơn */
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #1e293b;
+  transition: all 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.1);
+}
+
+.input-group input:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+/* ===== KHU VỰC TIỆN ÍCH (CHECKBOX GRID) ===== */
+.amenities-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
+  background-color: #ffffff;
+}
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 16px;
+  /* Khoảng cách giữa các hàng và cột */
+}
+
+.amenity-item {
+  display: flex !important;
+  flex-direction: row !important;
+  /* Ép cứng tất cả nằm ngang */
+  align-items: center !important;
+  /* Căn giữa theo chiều dọc */
+  justify-content: flex-start;
+  gap: 10px;
+  /* Tạo khoảng cách đều 10px giữa Checkbox, Icon và Chữ */
+  cursor: pointer;
+  font-size: 15px;
+  color: #334155;
+  user-select: none;
+  margin: 0;
+}
+
+.amenity-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #00A4D3;
+  margin: 0 !important;
+  /* Bỏ margin mặc định */
+  flex-shrink: 0;
+  /* Không cho ô tick bị bóp méo */
+}
+
+.amenity-icon {
+  font-size: 22px;
+  color: #64748b;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  /* Giữ cố định khung icon để chữ luôn thẳng cột */
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.amenity-item span {
+  display: inline-block !important;
+  /* Ép chữ nằm ngang với icon */
+  margin: 0;
+  white-space: nowrap;
+  /* Tránh việc chữ dài bị rớt xuống dòng */
+}
+
+/* ===== ẢNH XEM TRƯỚC ===== */
+.image-upload-wrapper {
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.rts-img-preview {
+  width: 100%;
+  height: 320px;
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.rts-img-preview.has-image {
+  border: none;
+}
+
+.rts-img-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.rts-img-preview .placeholder-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.rts-img-preview .placeholder-icon i {
+  font-size: 56px;
+}
+
+/* Lỗi Validation màu đỏ */
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 6px;
+  display: block;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+/* Modals */
+.modal-icon.success i {
+  color: #10b981;
+}
+
+/* ========================================================
+   ===== TỐI ƯU RESPONSIVE (GẬP MÀN HÌNH) =====
+   ======================================================== */
+
+@media (max-width: 992px) {
+
+  /* 1. Gập dọc màn hình: Danh sách trên, Form dưới */
+  .rs-body {
+    flex-direction: column;
+  }
+
+  /* 2. Danh sách: Chiếm 100% ngang, giới hạn chiều cao 35vh để cuộn */
+  .rs-sidebar {
+    width: 100%;
+    height: 35vh;
+    border-right: none;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  /* 3. Header & Form: Căn chỉnh lại khoảng cách */
+  .rs-header,
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .rs-header button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rs-content {
+    padding: 24px 20px;
+  }
+
+  /* Lưới 3 cột -> 2 cột */
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Lưới 2 cột -> 1 cột từ trên xuống dưới */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width,
+  .two-thirds {
+    grid-column: span 1;
+  }
+
+  /* Tiện ích: 3 cột -> 2 cột */
+  .amenities-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Cụm nút hành động dàn đều */
+  .form-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .form-actions button {
+    flex: 1;
+    white-space: nowrap;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Tiện ích trên màn hình cực nhỏ -> 1 cột */
+  .amenities-grid {
+    grid-template-columns: 1fr;
+  }
+}

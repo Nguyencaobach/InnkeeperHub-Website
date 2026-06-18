@@ -1,0 +1,810 @@
+/* ─────────────────────────────────────────────────────────────────
+   PaymentOverview.css
+   Bổ sung CSS cho màn hình Thanh toán & Trả phòng
+   Layout tái sử dụng ViewBooking + thêm phần Tổng kết ở footer
+   ───────────────────────────────────────────────────────────────── */
+
+/* ══ BADGE TRẠNG THÁI HEADER ════════════════════════════════════ */
+.po-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.po-status-badge i {
+  font-size: 16px;
+}
+
+/* ══ TAB DỊCH VỤ: 2 CỘT BÊN TRONG TAB CONTENT ══════════════════ */
+.po-service-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+.po-service-box {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  border-right: 1px solid #f0f4f9;
+}
+
+.po-service-box:last-child {
+  border-right: none;
+}
+
+/* ══ FOOTER TỔNG KẾT THANH TOÁN ════════════════════════════════ */
+.po-summary-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 28px 24px;
+  border-top: 2px solid #f0f4f9;
+  background: #ffffff;
+}
+
+/* ══ 1. Thời gian trả phòng ══ */
+.po-checkout-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.po-checkout-time-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.po-checkout-time-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* ── 2. Tổng tiền ── */
+.po-money-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.po-money-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.po-money-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.po-money-label i {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.po-money-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.po-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.po-total-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.po-total-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #dc2626;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+/* ── 3. Phương thức thanh toán ── */
+.po-method-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.po-method-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.1, 0.64, 1);
+  user-select: none;
+}
+
+.po-method-card:hover {
+  border-color: #00a4d3;
+  background: #f0faff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 164, 211, 0.12);
+}
+
+.po-method-card--active {
+  border-color: #00a4d3;
+  background: linear-gradient(135deg, #f0faff 0%, #e6f7fe 100%);
+  box-shadow: 0 4px 14px rgba(0, 164, 211, 0.2);
+  transform: translateY(-1px);
+}
+
+.po-method-card--active .po-method-icon {
+  background: #00a4d3;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 164, 211, 0.4);
+}
+
+.po-method-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  background: #e2e8f0;
+  color: #64748b;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.po-method-info {
+  flex: 1;
+}
+
+.po-method-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.po-method-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 2px 0 0;
+}
+
+.po-method-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.po-method-card--active .po-method-radio {
+  border-color: #00a4d3;
+  background: #00a4d3;
+}
+
+.po-method-radio-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s;
+}
+
+.po-method-card--active .po-method-radio-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ══ QR CHUYỂN KHOẢN ════════════════════════════════════════════ */
+.po-qr-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid #e0f2fe;
+  background: #f0f9ff;
+  animation: po-qr-appear 0.22s ease;
+}
+
+@keyframes po-qr-appear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Loading ── */
+.po-qr-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.po-qr-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #00a4d3;
+  border-radius: 50%;
+  animation: po-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes po-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── No info warning ── */
+.po-qr-no-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #fefce8;
+  border: 1.5px solid #fde68a;
+  border-radius: 14px;
+  color: #92400e;
+}
+
+.po-qr-no-info > i {
+  font-size: 22px;
+  color: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.po-qr-no-info-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 3px;
+}
+
+.po-qr-no-info-desc {
+  font-size: 13px;
+  color: #a16207;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── QR Card (layout ngang: image trái + info phải) ── */
+.po-qr-card {
+  display: flex;
+  gap: 0;
+}
+
+/* ─ QR image bên trái ─ */
+.po-qr-image-wrap {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-right: 1px solid #bae6fd;
+  padding: 12px;
+}
+
+.po-qr-image {
+  width: 176px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+.po-qr-fallback {
+  width: 160px;
+  height: 160px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: center;
+}
+
+.po-qr-fallback i {
+  font-size: 40px;
+  color: #cbd5e1;
+}
+
+/* ─ Thông tin bên phải ─ */
+.po-qr-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  gap: 8px;
+  justify-content: center;
+}
+
+.po-qr-info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.po-qr-info-row--amount {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed #bae6fd;
+}
+
+.po-qr-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.po-qr-info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: right;
+  word-break: break-all;
+}
+
+.po-qr-info-value--acct {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #0369a1;
+}
+
+.po-qr-info-value--red {
+  font-size: 18px;
+  font-weight: 800;
+  color: #dc2626;
+}
+
+@media (max-width: 600px) {
+  .po-qr-card {
+    flex-direction: column;
+  }
+
+  .po-qr-image-wrap {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #bae6fd;
+  }
+
+  .po-qr-image {
+    width: 200px;
+  }
+}
+
+/* ── 4. Nút Xác nhận ── */
+.po-confirm-btn {
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.po-confirm-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+}
+
+.po-confirm-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.po-confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.po-confirm-btn i {
+  font-size: 20px;
+}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .po-service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .po-service-box {
+    border-right: none;
+    border-bottom: 1px solid #f0f4f9;
+  }
+
+  .po-method-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══ NÚT TRIGGER XEM MÃ QR (trên card chuyển khoản) ══════════ */
+.po-qr-trigger-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #00a4d3;
+  background: #e0f7ff;
+  color: #0284c7;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.po-qr-trigger-btn:hover {
+  background: #00a4d3;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 164, 211, 0.35);
+}
+
+.po-qr-trigger-btn i {
+  font-size: 14px;
+}
+
+/* ══ QR MODAL OVERLAY ════════════════════════════════════════════ */
+.po-qr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: po-overlay-in 0.2s ease;
+}
+
+@keyframes po-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.po-qr-modal {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255,255,255,0.08);
+  overflow: hidden;
+  animation: po-modal-in 0.28s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+
+@keyframes po-modal-in {
+  from { opacity: 0; transform: scale(0.9) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─ Header ─ */
+.po-qr-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.po-qr-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.po-qr-modal-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00a4d3, #0284c7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 164, 211, 0.4);
+  flex-shrink: 0;
+}
+
+.po-qr-modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.po-qr-modal-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 2px 0 0;
+}
+
+.po-qr-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.16s;
+  flex-shrink: 0;
+}
+
+.po-qr-modal-close:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* ─ Body ─ */
+.po-qr-modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 22px;
+  gap: 20px;
+}
+
+.po-qr-modal-img-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.po-qr-modal-img {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+.po-qr-modal-fallback {
+  width: 280px;
+  height: 280px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 14px;
+  text-align: center;
+}
+
+.po-qr-modal-fallback i {
+  font-size: 64px;
+  color: #cbd5e1;
+}
+
+/* ─ Info rows ─ */
+.po-qr-modal-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.po-qr-modal-info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.po-qr-modal-amount-row {
+  padding-top: 10px;
+  margin-top: 2px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.po-qr-modal-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.po-qr-modal-info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: right;
+  word-break: break-all;
+}
+
+.po-qr-modal-acct {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  color: #0369a1;
+}
+
+.po-qr-modal-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: -0.5px;
+}
+
+/* ─ Footer ─ */
+.po-qr-modal-footer {
+  padding: 0 22px 22px;
+}
+
+.po-qr-modal-done-btn {
+  width: 100%;
+  padding: 13px 24px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #00a4d3 0%, #0284c7 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 164, 211, 0.4);
+  transition: all 0.2s;
+  letter-spacing: 0.2px;
+}
+
+.po-qr-modal-done-btn:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 8px 24px rgba(0, 164, 211, 0.5);
+  transform: translateY(-1px);
+}
+
+.po-qr-modal-done-btn i {
+  font-size: 17px;
+}
+
+.po-qr-modal-done-btn--green {
+  background: #0097b2;
+  box-shadow: 0 6px 20px rgba(0, 151, 178, 0.4);
+}
+
+.po-qr-modal-done-btn--green:hover {
+  background: #007a91;
+  box-shadow: 0 8px 24px rgba(0, 151, 178, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ══ NÚT IN HÓA ĐƠN ════════════════════════════════════════════ */
+.po-print-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.po-print-btn:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.po-print-btn:active {
+  background: #166534;
+  transform: translateY(0);
+}
+
+.po-print-btn i {
+  font-size: 17px;
+}
+
+/* ══ ẨN TOÀN BỘ GIAO DIỆN APP KHI IN ══════════════════════════ */
+@media print {
+  /* Ẩn tất cả mọi thứ trong app */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Chỉ hiện invoice root và tất cả con cháu của nó */
+  #invoice-print-root,
+  #invoice-print-root * {
+    visibility: visible !important;
+  }
+
+  /* Đặt invoice chiếm toàn trang */
+  #invoice-print-root {
+    position: fixed !important;
+    inset: 0 !important;
+    display: block !important;
+    background: #fff !important;
+    z-index: 99999 !important;
+  }
+}

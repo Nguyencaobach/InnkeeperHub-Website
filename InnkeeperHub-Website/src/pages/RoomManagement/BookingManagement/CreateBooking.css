@@ -1,0 +1,684 @@
+/* ─────────────────────────────────────────────────────────
+   CreateBooking.css
+   Giao diện tạo phiên thuê phòng
+   ───────────────────────────────────────────────────────── */
+
+/* ════ PAGE WRAPPER ════════════════════════════════════════ */
+.cb-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f8fafc;
+  overflow-y: auto;
+}
+
+/* ════ PAGE HEADER ════════════════════════════════════════ */
+.cb-page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf5;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+}
+
+.cb-btn-back {
+  background: none;
+  border: 1px solid #cbd5e1;
+  padding: 9px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.cb-btn-back:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.cb-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cb-page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1f36;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cb-page-title i {
+  color: #00a4d3;
+  font-size: 22px;
+}
+
+.cb-page-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ════ FORM WRAPPER ════════════════════════════════════════ */
+.cb-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px;
+  gap: 20px;
+}
+
+/* ════ 2-COLUMN BODY ═══════════════════════════════════════ */
+.cb-form-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ════ CARD ════════════════════════════════════════════════ */
+.cb-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8edf5;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cb-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f4f9;
+}
+
+.cb-card-header i {
+  font-size: 20px;
+}
+
+.cb-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1f36;
+}
+
+/* ════ FIELD ════════════════════════════════════════════════ */
+.cb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cb-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.cb-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.cb-optional {
+  font-weight: 400;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* ════ INPUT ════════════════════════════════════════════════ */
+.cb-input {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.cb-input::placeholder {
+  color: #9ca3af;
+}
+
+.cb-input:focus {
+  outline: none;
+  border-color: #00a4d3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.12);
+}
+
+.cb-input-error {
+  border-color: #ef4444 !important;
+}
+
+.cb-input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+.cb-error-msg {
+  font-size: 12px;
+  color: #ef4444;
+  margin: 0;
+}
+
+/* ════ CCCD UPLOAD ══════════════════════════════════════════ */
+.cb-cccd-preview {
+  width: 100%;
+  height: 110px;
+  background: #f8fafc;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.cb-cccd-preview.has-image {
+  border-style: solid;
+  border-color: #00a4d3;
+}
+
+.cb-cccd-placeholder {
+  color: #cbd5e1;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cb-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: fit-content;
+}
+
+.cb-file-label:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.cb-file-input {
+  display: none;
+}
+
+.cb-file-name {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ════ CHI TIẾT THUÊ PHÒNG ══════════════════════════════════ */
+.cb-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cb-detail-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.cb-detail-value {
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.cb-room-number {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1f36;
+}
+
+/* Nút hình thức thuê */
+.cb-rent-type-group {
+  display: flex;
+  gap: 8px;
+}
+
+.cb-rent-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid #d1d5db;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.cb-rent-btn:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.cb-rent-btn.active-hourly {
+  background: #00a4d3;
+  border-color: #00a4d3;
+  color: #fff;
+}
+
+.cb-rent-btn.active-daily {
+  background: #00a4d3;
+  border-color: #00a4d3;
+  color: #fff;
+}
+
+/* Giá phòng */
+.cb-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.cb-price-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+/* Khối thông tin loại phòng */
+.cb-roomtype-info {
+  background: #f8fafc;
+  border: 1px solid #e8edf5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cb-roomtype-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.cb-roomtype-label {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.cb-roomtype-label i {
+  font-size: 14px;
+  color: #10b981;
+}
+
+.cb-roomtype-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: right;
+}
+
+/* Divider */
+.cb-divider {
+  border: none;
+  border-top: 1px dashed #e2e8f0;
+  margin: 4px 0;
+}
+
+/* ════ DATETIME FIELD (Custom 24h picker) ════════════════════ */
+.cb-datetime-field {
+  gap: 8px;
+}
+
+.cb-datetime-label {
+  font-size: 13px;
+  font-weight: 600;
+  display: block;
+}
+
+.cb-label-checkin {
+  color: #1e293b;
+}
+
+.cb-label-checkout {
+  color: #1e293b;
+}
+
+/* Hàng chứa date input + time selects */
+.cb-dt-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Date input */
+.cb-dt-date {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #ffffff;
+  font-weight: 700;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.cb-dt-date:focus {
+  outline: none;
+  border-color: #00a4d3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.12);
+}
+
+.cb-dt-date--checkout {
+  border-color: #d1d5db;
+  color: #1e293b;
+  background: #ffffff;
+}
+
+.cb-dt-date--checkout:focus {
+  border-color: #00a4d3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.12);
+}
+
+/* Nhóm chọn giờ + phút */
+.cb-dt-time {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 8px;
+  padding: 0 10px;
+  height: 40px;
+  border: 1.5px solid #d1d5db;
+  background: #ffffff;
+}
+
+.cb-dt-time--checkout {
+  border-color: #d1d5db;
+  background: #ffffff;
+}
+
+/* Input số — ẩn spinner, hiển thị compact như native time */
+.cb-time-num {
+  width: 32px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  outline: none;
+  padding: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.cb-time-num::-webkit-inner-spin-button,
+.cb-time-num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cb-time-num--checkout {
+  color: #1e293b;
+}
+
+.cb-time-num--checkout::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.cb-dt-sep {
+  font-size: 16px;
+  font-weight: 800;
+  color: #475569;
+  line-height: 1;
+  user-select: none;
+  padding: 0 1px;
+}
+
+.cb-dt-sep--checkout {
+  color: #475569;
+}
+
+.cb-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ════ FOOTER BUTTONS ═══════════════════════════════════════ */
+.cb-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #e8edf5;
+}
+
+.cb-btn {
+  padding: 11px 24px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+}
+
+.cb-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cb-btn-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.cb-btn-cancel:hover:not(:disabled) {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.cb-btn-submit {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cb-btn-submit:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.cb-btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Spinner animation */
+@keyframes cb-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cb-spin {
+  animation: cb-spin 0.8s linear infinite;
+}
+
+/* ════ RESPONSIVE ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .cb-form-body {
+    grid-template-columns: 1fr;
+  }
+
+  .cb-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cb-footer {
+    justify-content: stretch;
+  }
+
+  .cb-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ════ SUCCESS MODAL ════════════════════════════════════════════ */
+.cb-success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(100, 116, 139, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: cb-overlay-in 0.2s ease;
+}
+
+@keyframes cb-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cb-success-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  max-width: 380px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: cb-modal-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cb-modal-pop {
+  from { opacity: 0; transform: scale(0.85) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cb-success-icon {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #2ecc71;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.cb-success-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+}
+
+.cb-success-desc {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 4px;
+}
+
+.cb-success-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #00a4d3;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.2px;
+}
+
+.cb-success-btn:hover {
+  background: #008eb8;
+  transform: translateY(-1px);
+}
+
+.cb-success-btn:active {
+  transform: translateY(0);
+}

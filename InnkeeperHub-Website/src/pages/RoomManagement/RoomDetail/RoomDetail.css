@@ -1,0 +1,215 @@
+/* ===== TỔNG THỂ BOX TRẮNG ===== */
+.room-detail-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.rd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rd-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  background: none;
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-back:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.rd-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a1f36;
+}
+.rd-header h2 span {
+  color: #00A4D3;
+}
+
+/* Ô tìm kiếm */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.search-input {
+  padding: 9px 14px 9px 32px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+
+.search-input::placeholder {
+  color: #b0bec5;
+  font-weight: 400;
+}
+
+.search-input:focus {
+  border-color: #00A4D3;
+  box-shadow: 0 0 0 3px rgba(0, 164, 211, 0.12);
+}
+
+/* ===== KHU VỰC DANH SÁCH ===== */
+.rd-body {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+}
+
+/* Danh sách dạng List */
+.room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.room-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+.room-list-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: #cbd5e1;
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.room-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1e293b;
+  width: 120px;
+}
+
+/* Các huy hiệu trạng thái */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-available { background: #dcfce7; color: #166534; }
+.status-occupied { background: #fee2e2; color: #991b1b; }
+.status-cleaning { background: #fef9c3; color: #854d0e; }
+.status-maintenance { background: #f1f5f9; color: #475569; }
+
+.room-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ===== NÚT HÀNH ĐỘNG (SỬA, XÓA) THEO MẪU MỚI ===== */
+.btn-action-text {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-action-text.edit {
+  background-color: #f59e0b;
+  color: white;
+  border: none;
+}
+.btn-action-text.edit:hover {
+  background-color: #d97706;
+}
+
+.btn-action-text.delete {
+  background-color: #fff5f5;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+.btn-action-text.delete:hover {
+  background-color: #fee2e2;
+}
+
+/* Trạng thái trống */
+.empty-list {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+}
+
+/* Modals Form nhập liệu */
+.modal-form-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+.modal-form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+.modal-form-group input, .modal-form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+}
+.modal-form-group input:focus, .modal-form-group select:focus {
+  outline: none;
+  border-color: #00A4D3;
+}
