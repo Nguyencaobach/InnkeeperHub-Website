@@ -1,17 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import categoryApi from '../../../api/productCategoryApi';
 import bookingServiceItemApi from '../../../api/bookingServiceItemApi';
+import { getImageSrc } from '../../../utils/imageUrl';
 import './ProductPickerModal.css';
-
-const BASE_URL = import.meta.env.VITE_API_URL || '';
-// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
-const getImageSrc = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) {
-    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
-  }
-  return `${BASE_URL}${url}`;
-};
 
 function ProductPickerModal({ bookingId, onAdded, onClose }) {
   // ── BƯỚC: 'category' | 'product' ──────────────────────────────

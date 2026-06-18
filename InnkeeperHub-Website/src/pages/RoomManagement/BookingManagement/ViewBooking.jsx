@@ -2,17 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import bookingApi from '../../../api/bookingApi';
 import roomTypeApi from '../../../api/roomTypeApi';
+import { getImageSrc } from '../../../utils/imageUrl';
 import './CreateBooking.css';
 import './ViewBooking.css';
-
-const BASE_URL = import.meta.env.VITE_API_URL || '';
-const getImageSrc = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) {
-    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
-  }
-  return `${BASE_URL}${url}`;
-};
 
 // ── Helpers (giống CreateBooking) ────────────────────────────────────────────
 const getToday = () => {

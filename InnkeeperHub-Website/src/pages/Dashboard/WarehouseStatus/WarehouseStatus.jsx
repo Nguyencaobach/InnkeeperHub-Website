@@ -1,16 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import warehouseStatusApi from '../../../api/warehouseStatusApi';
+import { getImageSrc } from '../../../utils/imageUrl';
 import './WarehouseStatus.css';
-
-const BASE_URL = import.meta.env.VITE_API_URL || '';
-// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
-const getImageSrc = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) {
-    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
-  }
-  return `${BASE_URL}${url}`;
-};
 
 const TABS = [
   { id: 'LOW_STOCK', label: 'Tồn kho hàng hóa', colorClass: 'warning' },

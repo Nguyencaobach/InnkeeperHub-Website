@@ -5,19 +5,11 @@ import bookingServiceItemApi from '../../../api/bookingServiceItemApi';
 import roomTypeApi from '../../../api/roomTypeApi';
 import profileApi from '../../../api/profileApi';
 import { printInvoice } from './printInvoice';
+import { getImageSrc } from '../../../utils/imageUrl';
 import './CreateBooking.css';
 import './ViewBooking.css';
 import './BookingServices.css';
 import './PaymentOverview.css';
-
-const BASE_URL = import.meta.env.VITE_API_URL || '';
-const getImageSrc = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) {
-    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
-  }
-  return `${BASE_URL}${url}`;
-};
 
 // ── Helpers (giống ViewBooking) ──────────────────────────────────────────────
 const formatMoney = (amount) =>
