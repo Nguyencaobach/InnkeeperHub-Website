@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import profileApi from '../../api/profileApi';
+import { getImageSrc } from '../../utils/imageUrl';
 import './ProfilePage.css';
 
 // =============================================
@@ -244,7 +245,7 @@ function PersonalProfileTab({ user, setUser }) {
               <img
                 src={
                   avatarPreview ||
-                  user.avatar_url ||
+                  getImageSrc(user.avatar_url) ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.username)}&background=00A4D3&color=fff&size=128`
                 }
                 alt="Avatar"
