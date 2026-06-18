@@ -4,6 +4,14 @@ import bookingServiceItemApi from '../../../api/bookingServiceItemApi';
 import './ProductPickerModal.css';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
 
 function ProductPickerModal({ bookingId, onAdded, onClose }) {
   // ── BƯỚC: 'category' | 'product' ──────────────────────────────
@@ -200,7 +208,7 @@ function ProductPickerModal({ bookingId, onAdded, onClose }) {
                         <div className="ppm-product-img-wrap">
                           {product.image_url ? (
                             <img
-                              src={`${BASE_URL}${product.image_url}`}
+                              src={getImageSrc(product.image_url)}
                               alt={product.name}
                               className="ppm-product-img"
                             />

@@ -3,6 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import roomTypeApi from '../../../api/roomTypeApi';
 import './RoomTypeSettings.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 // Danh sách các tiện ích (Phân tích từ hình mẫu)
 const AMENITIES_LIST = [
   { id: 'wifi', label: 'Wifi', icon: 'ph-wifi-high' },
@@ -94,7 +104,7 @@ function RoomTypeSettings() {
     setSelectedRoom(room);
     setFormData(room);
     setSelectedAmenities(parseAmenitiesString(room.amenities));
-    setImagePreview(room.room_img_url || null);
+    setImagePreview(room.room_img_url ? getImageSrc(room.room_img_url) : null);
     setIsEditing(false);
     setErrors({});
   };
@@ -240,7 +250,7 @@ function RoomTypeSettings() {
           setSelectedRoom(updatedRoom);
           setFormData(updatedRoom);
           setSelectedAmenities(parseAmenitiesString(updatedRoom.amenities));
-          setImagePreview(updatedRoom.room_img_url || null);
+          setImagePreview(updatedRoom.room_img_url ? getImageSrc(updatedRoom.room_img_url) : null);
         }
       }
 
@@ -299,7 +309,7 @@ function RoomTypeSettings() {
               {/* Ảnh bìa */}
               <div className="card-img-wrapper">
                 {room.room_img_url ? (
-                  <img src={room.room_img_url} alt={room.name} className="card-img" />
+                  <img src={getImageSrc(room.room_img_url)} alt={room.name} className="card-img" />
                 ) : (
                   <div className="card-img-placeholder">
                     <i className="ph-fill ph-image"></i>

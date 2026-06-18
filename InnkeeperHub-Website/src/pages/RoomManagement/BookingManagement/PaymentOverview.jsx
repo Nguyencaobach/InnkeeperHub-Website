@@ -10,6 +10,15 @@ import './ViewBooking.css';
 import './BookingServices.css';
 import './PaymentOverview.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 // ── Helpers (giống ViewBooking) ──────────────────────────────────────────────
 const formatMoney = (amount) =>
   amount != null ? Number(amount).toLocaleString('vi-VN') + ' đ' : '—';
@@ -336,7 +345,7 @@ function PaymentOverview() {
                 <label className="cb-label">Ảnh CCCD (Mặt Trước)</label>
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_front_url ? 'has-image' : ''}`}
-                  style={booking?.cccd_front_url ? { backgroundImage: `url(${booking.cccd_front_url})` } : {}}
+                  style={booking?.cccd_front_url ? { backgroundImage: `url(${getImageSrc(booking.cccd_front_url)})` } : {}}
                 >
                   {!booking?.cccd_front_url && (
                     <span className="cb-cccd-placeholder">
@@ -352,7 +361,7 @@ function PaymentOverview() {
                 <label className="cb-label">Ảnh CCCD (Mặt Sau)</label>
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_back_url ? 'has-image' : ''}`}
-                  style={booking?.cccd_back_url ? { backgroundImage: `url(${booking.cccd_back_url})` } : {}}
+                  style={booking?.cccd_back_url ? { backgroundImage: `url(${getImageSrc(booking.cccd_back_url)})` } : {}}
                 >
                   {!booking?.cccd_back_url && (
                     <span className="cb-cccd-placeholder">

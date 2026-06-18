@@ -5,6 +5,15 @@ import roomTypeApi from '../../../api/roomTypeApi';
 import './CreateBooking.css';
 import './ViewBooking.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 // ── Helpers (giống CreateBooking) ────────────────────────────────────────────
 const getToday = () => {
   const now = new Date();
@@ -368,7 +377,7 @@ function ViewBooking() {
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_front_url ? 'has-image' : ''}`}
                   style={booking?.cccd_front_url
-                    ? { backgroundImage: `url(${booking.cccd_front_url})` }
+                    ? { backgroundImage: `url(${getImageSrc(booking.cccd_front_url)})` }
                     : {}}
                 >
                   {!booking?.cccd_front_url && (
@@ -386,7 +395,7 @@ function ViewBooking() {
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_back_url ? 'has-image' : ''}`}
                   style={booking?.cccd_back_url
-                    ? { backgroundImage: `url(${booking.cccd_back_url})` }
+                    ? { backgroundImage: `url(${getImageSrc(booking.cccd_back_url)})` }
                     : {}}
                 >
                   {!booking?.cccd_back_url && (

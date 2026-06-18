@@ -3,6 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import roomTypeApi from '../../../api/roomTypeApi';
 import './RoomTypeOverview.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 // Danh sách các tiện ích để so sánh và hiển thị icon
 const AMENITIES_LIST = [
   { id: 'wifi', label: 'Wifi', icon: 'ph-wifi-high' },
@@ -105,7 +115,7 @@ function RoomActivityOverview() {
               {/* Ảnh bìa */}
               <div className="card-img-wrapper">
                 {room.room_img_url ? (
-                  <img src={room.room_img_url} alt={room.name} className="card-img" />
+                  <img src={getImageSrc(room.room_img_url)} alt={room.name} className="card-img" />
                 ) : (
                   <div className="card-img-placeholder">
                     <i className="ph-fill ph-image"></i>
@@ -205,7 +215,7 @@ function RoomActivityOverview() {
         {selectedRoom.room_img_url && (
           <div className="image-section">
             <h4 style={{ margin: '0 0 16px', color: '#334155', fontSize: '16px' }}>Ảnh đại diện</h4>
-            <img src={selectedRoom.room_img_url} alt={selectedRoom.name} className="room-cover-img" />
+            <img src={getImageSrc(selectedRoom.room_img_url)} alt={selectedRoom.name} className="room-cover-img" />
           </div>
         )}
       </div>
