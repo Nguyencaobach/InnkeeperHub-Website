@@ -5,6 +5,17 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import productApi from '../../../api/productApi';
 import './Products.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    // Thay thế bất kỳ origin nào (kể cả localhost cũ) bằng BASE_URL hiện tại
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 function Products() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -430,7 +441,7 @@ function Products() {
                   {/* Ảnh đại diện thu nhỏ */}
                   <div className="product-avatar">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', borderRadius: '7px', objectFit: 'cover' }} />
+                      <img src={getImageSrc(product.image_url)} alt={product.name} style={{ width: '100%', height: '100%', borderRadius: '7px', objectFit: 'cover' }} />
                     ) : (
                       <i className="ph ph-image" style={{ fontSize: '24px' }}></i>
                     )}

@@ -2,6 +2,16 @@ import { useState, useEffect, useCallback } from 'react';
 import warehouseStatusApi from '../../../api/warehouseStatusApi';
 import './WarehouseStatus.css';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '';
+// Xử lý cả URL tương đối mới (/uploads/...) lẫn full URL cũ (http://localhost:3000/...)
+const getImageSrc = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    try { return BASE_URL + new URL(url).pathname; } catch { return url; }
+  }
+  return `${BASE_URL}${url}`;
+};
+
 const TABS = [
   { id: 'LOW_STOCK', label: 'Tồn kho hàng hóa', colorClass: 'warning' },
   { id: 'EXPIRING', label: 'HSD hàng hóa', colorClass: 'warning' },
@@ -242,7 +252,7 @@ function WarehouseStatus() {
                           <td className="td-product">
                             <div className="td-avatar">
                               {item.image_url ? (
-                                <img src={item.image_url} alt="img" style={{ width: '100%', height: '100%', borderRadius: '6px', objectFit: 'cover' }} />
+                                <img src={getImageSrc(item.image_url)} alt="img" style={{ width: '100%', height: '100%', borderRadius: '6px', objectFit: 'cover' }} />
                               ) : <i className="ph ph-image"></i>}
                             </div>
                             {item.product_name}
