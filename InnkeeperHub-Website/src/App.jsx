@@ -21,44 +21,47 @@ import AccountActivity from './pages/AccountActivity/AccountActivity';
 import RoomInvoiceLog from './pages/AccountActivity/RoomInvoiceLog';
 import WarehouseStatus from './pages/Dashboard/WarehouseStatus/WarehouseStatus';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import NgrokGate from './components/NgrokGate/NgrokGate';
 
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Route không có layout */}
-        <Route path="/login" element={<LoginPage />} />
+    <NgrokGate>
+      <BrowserRouter>
+        <Routes>
+          {/* Route không có layout */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Cụm Route ĐƯỢC BỌC BỞI LAYOUT */}
-        <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<HomePage />} />
-          <Route path="/rooms/settings" element={<RoomTypeSettings />} />
-          <Route path="/rooms/details/:id" element={<RoomDetail />} />
-          <Route path="rooms/activities" element={<RoomTypeOverview />} />
-          <Route path="rooms/activities/list/:id" element={<RoomDetailOverview />} />
-          <Route path="rooms/activities/list/:id/create-booking" element={<CreateBooking />} />
-          <Route path="rooms/activities/list/:id/view-booking" element={<ViewBooking />} />
-          <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
-          <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
-          <Route path="/staff-management/account" element={<StaffManagement />} />
-          <Route path="/staff-management/timekeeping" element={<StaffManagement />} />
-          <Route path="/customers" element={<CustomerManagement />} />
-          <Route path="/warehouse/categories" element={<ProductCategory />} />
-          <Route path="/warehouse/products" element={<Products />} />
-          <Route path="/warehouse/product-batches" element={<ProductBatches />} />
-          <Route path="/services/discount" element={<Discount />} />
-          <Route path="/services/additional" element={<AdditionalServices />} />
-          <Route path="/records/account-logs" element={<AccountActivity />} />
-          <Route path="/records/room-invoices" element={<RoomInvoiceLog />} />
-          <Route path="/dashboard/warehouse-status" element={<WarehouseStatus />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Route>
+          {/* Cụm Route ĐƯỢC BỌC BỞI LAYOUT */}
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<HomePage />} />
+            <Route path="/rooms/settings" element={<RoomTypeSettings />} />
+            <Route path="/rooms/details/:id" element={<RoomDetail />} />
+            <Route path="rooms/activities" element={<RoomTypeOverview />} />
+            <Route path="rooms/activities/list/:id" element={<RoomDetailOverview />} />
+            <Route path="rooms/activities/list/:id/create-booking" element={<CreateBooking />} />
+            <Route path="rooms/activities/list/:id/view-booking" element={<ViewBooking />} />
+            <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
+            <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
+            <Route path="/staff-management/account" element={<StaffManagement />} />
+            <Route path="/staff-management/timekeeping" element={<StaffManagement />} />
+            <Route path="/customers" element={<CustomerManagement />} />
+            <Route path="/warehouse/categories" element={<ProductCategory />} />
+            <Route path="/warehouse/products" element={<Products />} />
+            <Route path="/warehouse/product-batches" element={<ProductBatches />} />
+            <Route path="/services/discount" element={<Discount />} />
+            <Route path="/services/additional" element={<AdditionalServices />} />
+            <Route path="/records/account-logs" element={<AccountActivity />} />
+            <Route path="/records/room-invoices" element={<RoomInvoiceLog />} />
+            <Route path="/dashboard/warehouse-status" element={<WarehouseStatus />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
 
-        {/* Mặc định: chuyển về dashboard hoặc login */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Mặc định: chuyển về dashboard hoặc login */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </NgrokGate>
   );
 }
 
