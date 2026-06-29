@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useProfileQuery } from '../../hooks/useProfile';
 import './MainLayout.css';
 
 function MainLayout() {
@@ -19,25 +20,25 @@ function MainLayout() {
     return userData ? JSON.parse(userData) : null;
   });
 
-  // State riêng cho avatar — tự cập nhật khi ProfilePage thay đổi localStorage
-  const [avatarUrl, setAvatarUrl] = useState(() => {
-    const userData = localStorage.getItem('user');
-    if (!userData) return null;
-    return JSON.parse(userData)?.avatar_url || null;
-  });
+  // Dùng TanStack Query để luôn có profile mới nhất (bao gồm avatar_url)
+  const { data: profileData } = useProfileQuery();
 
-  // Lắng nghe sự kiện storage (khi ProfilePage lưu avatar mới)
+  // avatar_url: ưu tiên data từ server (profileData.data), fallback về localStorage
+  // axiosClient interceptor trả về response.data → profileData = { success, data: {...} }
+  const avatarUrl = profileData?.data?.avatar_url
+    || JSON.parse(localStorage.getItem('user') || '{}')?.avatar_url
+    || null;
+
+  // Lắng nghe sự kiện storage (khi ProfilePage lưu thông tin mới vào localStorage)
   useEffect(() => {
     const handleStorageChange = () => {
       const userData = localStorage.getItem('user');
       if (userData) {
         const parsed = JSON.parse(userData);
         setUser(parsed);
-        setAvatarUrl(parsed.avatar_url || null);
       }
     };
     window.addEventListener('storage', handleStorageChange);
-    // Poll mỗi 2s để bắt sự kiện cùng tab (storage event chỉ fire cross-tab)
     const interval = setInterval(handleStorageChange, 2000);
     return () => {
       window.removeEventListener('storage', handleStorageChange);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useProductBatchesQuery, useCreateProductBatch, useUpdateProductBatch, useDeleteProductBatch } from '../../../hooks/useProductBatches';
 import './ProductBatches.css';
@@ -73,12 +73,14 @@ function ProductBatches() {
   const isSaving = createBatchMutation.isPending || updateBatchMutation.isPending;
   const isDeleting = deleteBatchMutation.isPending;
 
+  const hasRedirected = useRef(false);
   useEffect(() => {
-    if (!productId) {
-      navigate('/warehouse/categories');
+    if (productId == null && !hasRedirected.current) {
+      hasRedirected.current = true;
+      navigate('/warehouse/categories', { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, navigate]);
+  }, [productId]);
 
   // ===== BỘ LỌC =====
   const displayBatches = batchList.filter(b => {

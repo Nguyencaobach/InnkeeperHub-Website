@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import bookingApi from '../../../api/bookingApi';
 import roomTypeApi from '../../../api/roomTypeApi';
+import { QUERY_KEYS } from '../../../hooks/queryKeys';
 import './CreateBooking.css';
 
 // Lấy ngày hôm nay dạng YYYY-MM-DD (theo giờ máy)
@@ -36,6 +38,7 @@ const formatMoney = (amount) =>
 function CreateBooking() {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   // Lấy roomTypeId từ URL (:id trong route rooms/activities/list/:id/create-booking)
   const { id: roomTypeId } = useParams();
 
@@ -184,6 +187,29 @@ function CreateBooking() {
 
       const result = await bookingApi.create(formData);
       setCreatedBookingCode(result?.data?.booking_code || result?.booking_code || '');
+
+      // THAY THẾ ĐOẠN SET CACHE CŨ BẰNG ĐOẠN NÀY
+      queryClient.setQueryData(QUERY_KEYS.ROOM_DETAILS(roomTypeId), (oldData) => {
+        if (!oldData) return oldData;
+        // Nếu dữ liệu là mảng trực tiếp
+        if (Array.isArray(oldData)) {
+          return oldData.map(r => r.id === room.id ? { ...r, status: 'OCCUPIED' } : r);
+        }
+        // Nếu dữ liệu bọc trong object { data: [...] }
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map(r => r.id === room.id ? { ...r, status: 'OCCUPIED' } : r)
+          };
+        }
+        return oldData;
+      });
+
+      // Invalidate cache để RoomDetailOverview refetch trạng thái phòng mới
+      // (stảtTime = 0 cho room details — quan trọng, cầp nhật ngay)
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOOKINGS });
+
       setShowSuccess(true);
     } catch (error) {
       const msg =
@@ -519,7 +545,14 @@ function CreateBooking() {
             </p>
             <button
               className="cb-success-btn"
-              onClick={() => navigate(-1)}
+              onClick={async () => {
+                // invalidateQueries đã chạy ở handleSubmit
+                // RoomDetailOverview giờ dùng TanStack Query → tự refetch khi mount
+                await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
+                navigate(`/rooms/activities/list/${roomTypeId}`, {
+                  state: { roomTypeName: location.state?.roomTypeName }
+                });
+              }}
             >
               Đóng
             </button>

@@ -20,8 +20,8 @@ export function useAllRoomDetailsQuery() {
     queryKey: QUERY_KEYS.ROOM_DETAILS_ALL,
     queryFn: () => roomDetailApi.getAll(),
     select: normalizeList,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: 0,          // Hoạt động phòng: cập nhật ngay lập tức
+    gcTime: 2 * 60 * 1000, // Giữ cache 2 phút, tránh gọi lại khi đang ở trang khác
   });
 }
 
@@ -37,8 +37,8 @@ export function useRoomDetailsByTypeQuery(roomTypeId) {
       return roomTypeId ? list.filter((r) => String(r.room_type_id) === String(roomTypeId)) : list;
     },
     enabled: !!roomTypeId,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: 0,          // Hoạt động phòng: cập nhật ngay lập tức
+    gcTime: 2 * 60 * 1000,
   });
 }
 

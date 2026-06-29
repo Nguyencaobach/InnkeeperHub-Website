@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import bookingApi from '../../../api/bookingApi';
 import bookingServiceItemApi from '../../../api/bookingServiceItemApi';
 import roomTypeApi from '../../../api/roomTypeApi';
 import profileApi from '../../../api/profileApi';
 import { printInvoice } from './printInvoice';
 import { getImageSrc } from '../../../utils/imageUrl';
+import { QUERY_KEYS } from '../../../hooks/queryKeys';
 import './CreateBooking.css';
 import './ViewBooking.css';
 import './BookingServices.css';
@@ -39,6 +41,7 @@ const parseISOtoParts = (isoStr) => {
 function PaymentOverview() {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { id: roomTypeId } = useParams();
 
   // Dữ liệu truyền qua từ ViewBooking
@@ -213,6 +216,27 @@ function PaymentOverview() {
       };
 
       await bookingApi.checkout(booking.booking_id, paymentPayload);
+
+      // THAY THẾ ĐOẠN SET CACHE CŨ BẰNG ĐOẠN NÀY
+      queryClient.setQueryData(QUERY_KEYS.ROOM_DETAILS(roomTypeId), (oldData) => {
+        if (!oldData) return oldData;
+        if (Array.isArray(oldData)) {
+          return oldData.map(r => r.id === room.id ? { ...r, status: 'CLEANING' } : r);
+        }
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map(r => r.id === room.id ? { ...r, status: 'CLEANING' } : r)
+          };
+        }
+        return oldData;
+      });
+
+      // Invalidate cache để RoomDetailOverview hiển đúng trạng thái sau checkout
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOOKINGS });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BILL_PAYMENTS_LOG });
+
       setShowConfirmModal(false);
       setShowSuccessModal(true);
     } catch (err) {
@@ -679,7 +703,14 @@ function PaymentOverview() {
               Phiên thuê phòng <strong>{room?.room_number}</strong> đã được hoàn tất.<br />
               Phòng đã chuyển sang trạng thái <strong>Cần dọn dẹp</strong>.
             </p>
-            <button className="cb-success-btn" onClick={() => navigate(-2)}>
+            <button className="cb-success-btn" onClick={async () => {
+              // Invalidate cache → RoomDetailOverview (TanStack Query) tự refetch
+              await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
+              await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOOKINGS });
+              navigate(`/rooms/activities/list/${roomTypeId}`, {
+                state: { roomTypeName }
+              });
+            }}>
               Về danh sách phòng
             </button>
           </div>

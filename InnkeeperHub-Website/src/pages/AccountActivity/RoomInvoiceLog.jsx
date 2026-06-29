@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBillPaymentsLogQuery, useDeleteBillPayment } from '../../hooks/useBillPayments';
+import billPaymentsApi from '../../api/billPaymentsApi';
 import profileApi from '../../api/profileApi';
 import { printInvoiceFromBill } from './printInvoiceFromBill';
 import './RoomInvoiceLog.css';
@@ -90,17 +91,20 @@ function RoomInvoiceLog() {
   const canPrev       = currentPage > 1;
   const canNext       = currentPage < totalPages;
 
-  // ── Xem chi tiết ─────────────────────────────────────────────
+  // ── Xem chi tiết → mở PDF hóa đơn trực tiếp (như PaymentOverview) ─────
   const handleViewDetail = async (bill) => {
-    setIsLoadingDetail(true);
-    setShowDetailModal(true);
+    // Nếu businessInfo chưa load, đợi load xong
     try {
-      const res = await billPaymentsApi.getById(bill.id);
-      setDetailBill(res?.data ?? res);
-    } catch {
-      setDetailBill(bill);
-    } finally {
-      setIsLoadingDetail(false);
+      let detailData = bill;
+      try {
+        const res = await billPaymentsApi.getById(bill.id);
+        detailData = res?.data ?? res;
+      } catch {
+        // fallback: dùng dữ liệu từ danh sách
+      }
+      printInvoiceFromBill({ bill: detailData, businessInfo });
+    } catch (e) {
+      console.error('[RoomInvoiceLog] handleViewDetail error:', e);
     }
   };
 

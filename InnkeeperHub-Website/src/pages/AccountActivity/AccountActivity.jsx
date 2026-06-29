@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useActivityLogsQuery, useDeleteActivityLogs } from '../../hooks/useActivity';
 import './AccountActivity.css';
 

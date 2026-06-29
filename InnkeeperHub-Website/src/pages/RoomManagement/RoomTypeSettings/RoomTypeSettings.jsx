@@ -52,6 +52,7 @@ function RoomTypeSettings() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [wasCreatingNew, setWasCreatingNew] = useState(false); // track để sau success biết có phải tạo mới không
 
   // isSaving/isDeleting lấy từ mutation state
   const isSaving = createRoomTypeMutation.isPending || updateRoomTypeMutation.isPending;
@@ -210,26 +211,35 @@ function RoomTypeSettings() {
         const createdData = created?.data ?? created;
         savedId = createdData?.id;
       }
-      // Cache được invalidate bởi mutation onSuccess → roomTypes sẽ tự refresh
-      // Hiển thị lại form với data mới từ cache sau khi re-render
 
-      if (savedId) {
-        // Refetch để lấy data mới nhất từ server sau khi mutation
-        await queryClient.refetchQueries({ queryKey: QUERY_KEYS.ROOM_TYPES });
-        const freshList = queryClient.getQueryData(QUERY_KEYS.ROOM_TYPES) || [];
-        const updatedRoom = freshList.find(r => String(r.id) === String(savedId));
-        if (updatedRoom) {
-          setSelectedRoom(updatedRoom);
-          setFormData(updatedRoom);
-          setSelectedAmenities(parseAmenitiesString(updatedRoom.amenities));
-          setImagePreview(updatedRoom.room_img_url ? getImageSrc(updatedRoom.room_img_url) : null);
-        }
-      }
-
-
+      // Mutation thành công — đóng modal và hiện success trước
+      setWasCreatingNew(!selectedRoom); // lưu lại trước khi setIsEditing
       setShowSaveModal(false);
       setIsEditing(false);
       setShowSuccessModal(true);
+
+      // Sau đó refetch và cập nhật UI (nếu fail chỉ là UI, không hiện lỗi)
+      if (savedId) {
+        try {
+          await queryClient.refetchQueries({ queryKey: QUERY_KEYS.ROOM_TYPES });
+          // axiosClient trả về response.data nên cache chứa { success, data: [...] }
+          const cacheRaw = queryClient.getQueryData(QUERY_KEYS.ROOM_TYPES);
+          const freshList = Array.isArray(cacheRaw)
+            ? cacheRaw
+            : Array.isArray(cacheRaw?.data)
+              ? cacheRaw.data
+              : [];
+          const updatedRoom = freshList.find(r => String(r.id) === String(savedId));
+          if (updatedRoom) {
+            setSelectedRoom(updatedRoom);
+            setFormData(updatedRoom);
+            setSelectedAmenities(parseAmenitiesString(updatedRoom.amenities));
+            setImagePreview(updatedRoom.room_img_url ? getImageSrc(updatedRoom.room_img_url) : null);
+          }
+        } catch (uiErr) {
+          console.warn('[RoomTypeSettings] Refetch sau save thất bại (chỉ ảnh hưởng UI):', uiErr);
+        }
+      }
 
     } catch (error) {
       console.error("Lỗi khi lưu:", error);
@@ -252,7 +262,18 @@ function RoomTypeSettings() {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Lỗi khi xóa:", error);
-      alert("Lỗi khi xóa.");
+      const rawMsg = error.response?.data?.message
+        || error.response?.data?.errors?.join('\n')
+        || '';
+
+      // Dịch lỗi kỹ thuật DB sang message thân thiện
+      let userMsg;
+      if (rawMsg.toLowerCase().includes('foreign key') || rawMsg.toLowerCase().includes('constraint') || rawMsg.toLowerCase().includes('violates')) {
+        userMsg = 'Không thể xóa loại phòng này vì vẫn còn phòng đang thuộc loại này.\n\nVui lòng xóa tất cả các phòng trong loại phòng này trước rồi mới xóa loại phòng.';
+      } else {
+        userMsg = rawMsg || 'Không thể xóa loại phòng. Vui lòng thử lại sau.';
+      }
+      alert(userMsg);
       setShowDeleteModal(false);
     }
   };
@@ -481,7 +502,18 @@ function RoomTypeSettings() {
             <h3 style={{ marginTop: '16px' }}>Thành công!</h3>
             <p>Hành động của bạn đã được thực hiện thành công.</p>
             <div className="modal-actions" style={{ marginTop: '24px' }}>
-              <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowSuccessModal(false)}>Đóng</button>
+              {wasCreatingNew ? (
+                // Sau khi tạo mới → về danh sách
+                <button className="btn-primary" style={{ width: '100%' }} onClick={() => {
+                  setShowSuccessModal(false);
+                  setWasCreatingNew(false);
+                  handleBackToGrid();
+                }}>
+                  Về danh sách loại phòng
+                </button>
+              ) : (
+                <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowSuccessModal(false)}>Đóng</button>
+              )}
             </div>
           </div>
         </div>

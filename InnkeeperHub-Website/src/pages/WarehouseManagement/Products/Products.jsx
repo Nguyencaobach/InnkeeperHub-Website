@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import JsBarcode from 'jsbarcode';
 import { BrowserMultiFormatReader } from '@zxing/browser';
@@ -17,7 +17,8 @@ function Products() {
   // ===== TANSTACK QUERY =====
   // Products.jsx lấy tất cả rồi filter theo categoryId bằng select
   const { data: productList = [] } = useProductsQuery();
-  const filteredByCategory = productList.filter(p => p.category_id === categoryId);
+  // Dùng String() để so sánh an toàn giữa number và string
+  const filteredByCategory = productList.filter(p => String(p.category_id) === String(categoryId));
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const deleteProductMutation = useDeleteProduct();
@@ -56,12 +57,15 @@ function Products() {
   const codeReaderRef = useRef(null);
   const scannerControlsRef = useRef(null);
 
+  // Guard: chỉ redirect nếu thực sự không có categoryId (tránh loop với Strict Mode)
+  const hasRedirected = useRef(false);
   useEffect(() => {
-    if (!categoryId) {
-      navigate('/warehouse/categories');
+    if (categoryId == null && !hasRedirected.current) {
+      hasRedirected.current = true;
+      navigate('/warehouse/categories', { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryId, navigate]);
+  }, [categoryId]);
 
   // ===== BỘ LỌC KẾT HỢP (Status + Keyword) =====
   const displayProducts = filteredByCategory.filter(product => {

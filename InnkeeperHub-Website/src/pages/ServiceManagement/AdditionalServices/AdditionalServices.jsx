@@ -271,7 +271,7 @@ function AdditionalServices() {
       {/* ===== MODAL FORM THÊM / SỬA ===== */}
       {showFormModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content as-form-modal">
             <h3 style={{ marginTop: 0, marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' }}>
               {isEditing ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'}
             </h3>
@@ -283,12 +283,20 @@ function AdditionalServices() {
             )}
 
             <div className="form-grid">
-              <div className="modal-form-group full-width">
+              <div className="modal-form-group">
                 <label>Nhóm dịch vụ</label>
                 <select name="category" value={formData.category} onChange={handleChange}>
                   {SERVICE_CATEGORIES.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.label}</option>
                   ))}
+                </select>
+              </div>
+
+              <div className="modal-form-group">
+                <label>Trạng thái hiển thị</label>
+                <select name="is_active" value={formData.is_active !== false ? "true" : "false"} onChange={handleChange}>
+                  <option value="true">Đang phục vụ</option>
+                  <option value="false">Ngừng cung cấp</option>
                 </select>
               </div>
 
@@ -320,16 +328,9 @@ function AdditionalServices() {
 
               <div className="modal-form-group full-width">
                 <label>Mô tả chi tiết</label>
-                <textarea name="description" value={formData.description || ''} onChange={handleChange} placeholder="Nhập mô tả thêm về dịch vụ này (không bắt buộc)..." rows="2"></textarea>
+                <textarea name="description" value={formData.description || ''} onChange={handleChange} placeholder="Nhập mô tả thêm về dịch vụ này (không bắt buộc)..." rows="3"></textarea>
               </div>
 
-              <div className="modal-form-group full-width">
-                <label>Trạng thái hiển thị</label>
-                <select name="is_active" value={formData.is_active !== false ? "true" : "false"} onChange={handleChange}>
-                  <option value="true">Đang phục vụ</option>
-                  <option value="false">Ngừng cung cấp</option>
-                </select>
-              </div>
 
               {/* Upload Ảnh */}
               <div className="modal-form-group full-width">

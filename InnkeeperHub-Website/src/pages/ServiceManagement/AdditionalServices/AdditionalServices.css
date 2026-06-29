@@ -152,14 +152,18 @@
 }
 
 .modal-content {
-  background: white; border-radius: 16px; padding: 28px; width: 100%;
-  max-width: 500px; max-height: 90vh; overflow-y: auto; text-align: left;
+  background: white; border-radius: 16px; padding: 32px; width: 100%;
+  max-width: 720px; max-height: 90vh; overflow-y: auto; text-align: left;
+}
+
+.as-form-modal {
+  max-width: 800px !important; /* Mở rộng chiều ngang modal */
 }
 
 .modal-form-group { margin-bottom: 16px; }
 .modal-form-group label { display: block; font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 8px; }
 .modal-form-group input, .modal-form-group select, .modal-form-group textarea {
-  width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; outline: none;
+  width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 4px !important; font-size: 15px; outline: none;
 }
 .modal-form-group input:focus, .modal-form-group select:focus, .modal-form-group textarea:focus { border-color: #00A4D3; }
 .input-error { border-color: #ef4444 !important; }

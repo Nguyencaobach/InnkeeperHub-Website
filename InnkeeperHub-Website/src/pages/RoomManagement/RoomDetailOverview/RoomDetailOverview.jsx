@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import roomDetailApi from '../../../api/roomDetailApi';
-import roomTypeApi from '../../../api/roomTypeApi';
+import { useRoomDetailsByTypeQuery } from '../../../hooks/useRoomDetails';
+import { useRoomTypesQuery } from '../../../hooks/useRoomTypes';
 import './RoomDetailOverview.css';
 
 function RoomActivityList() {
@@ -11,51 +11,21 @@ function RoomActivityList() {
 
   const roomTypeName = location.state?.roomTypeName || 'Chi tiết loại phòng';
 
-  const [roomDetails, setRoomDetails] = useState([]);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [roomTypeData, setRoomTypeData] = useState(null);
 
-  // Lấy danh sách phòng và lọc theo Loại phòng đang chọn
-  const fetchRoomDetails = async () => {
-    try {
-      // axiosClient interceptor đã unwrap response.data, nên res là array trực tiếp
-      const res = await roomDetailApi.getAll();
-      const data = Array.isArray(res) ? res : (res?.data ?? []);
-      const filteredRooms = data.filter(room => String(room.room_type_id) === String(roomTypeId));
-      // Sắp xếp theo tên phòng (VD: P101, P102)
-      filteredRooms.sort((a, b) =>
-        a.room_number.localeCompare(b.room_number, undefined, { numeric: true, sensitivity: 'base' })
-      );
-      setRoomDetails(filteredRooms);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách phòng:", error);
-    }
-  };
+  // ── TANSTACK QUERY (thay vì raw axios) ──
+  // refetchOnMount: 'always' → mỗi lần navigate về trang này đều fetch server mới nhất
+  const { data: roomDetails = [] } = useRoomDetailsByTypeQuery(roomTypeId);
+  const { data: roomTypesList = [] } = useRoomTypesQuery();
+  const roomTypeData = roomTypesList.find(rt => String(rt.id) === String(roomTypeId)) || null;
 
-  // Lấy thông tin loại phòng (giá, sức chứa, loại giường...)
-  const fetchRoomType = async () => {
-    try {
-      const res = await roomTypeApi.getAll();
-      const data = Array.isArray(res) ? res : (res?.data ?? []);
-      const found = data.find(rt => String(rt.id) === String(roomTypeId));
-      if (found) setRoomTypeData(found);
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin loại phòng:", error);
-    }
-  };
+  // Sắp xếp theo tên phòng
+  const sortedRooms = [...roomDetails].sort((a, b) =>
+    a.room_number.localeCompare(b.room_number, undefined, { numeric: true, sensitivity: 'base' })
+  );
 
-  useEffect(() => {
-    // Bọc trong async IIFE để tránh lỗi "setState synchronously within an effect"
-    const initFetch = async () => {
-      await fetchRoomDetails();
-      await fetchRoomType();
-    };
-    initFetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomTypeId]);
-
-  const displayRooms = roomDetails.filter(room => {
+  const displayRooms = sortedRooms.filter(room => {
     const matchStatus = filterStatus === 'ALL' || room.status === filterStatus;
     const matchSearch = room.room_number.toLowerCase().includes(searchTerm.toLowerCase().trim());
     return matchStatus && matchSearch;
