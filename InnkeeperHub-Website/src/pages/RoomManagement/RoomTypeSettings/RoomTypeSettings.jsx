@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import roomTypeApi from '../../../api/roomTypeApi';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRoomTypesQuery, useCreateRoomType, useUpdateRoomType, useDeleteRoomType } from '../../../hooks/useRoomTypes';
+import { QUERY_KEYS } from '../../../hooks/queryKeys';
 import { getImageSrc } from '../../../utils/imageUrl';
 import './RoomTypeSettings.css';
 
@@ -29,8 +31,14 @@ const AMENITIES_LIST = [
 function RoomTypeSettings() {
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const [roomTypes, setRoomTypes] = useState([]);
+  // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchRoomTypes =====
+  const { data: roomTypes = [], isLoading: isLoadingRoomTypes } = useRoomTypesQuery();
+  const createRoomTypeMutation = useCreateRoomType();
+  const updateRoomTypeMutation = useUpdateRoomType();
+  const deleteRoomTypeMutation = useDeleteRoomType();
+
   // null = hiển thị grid card, có giá trị = hiển thị form chi tiết
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -45,31 +53,9 @@ function RoomTypeSettings() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const fetchRoomTypes = async () => {
-    try {
-      const res = await roomTypeApi.getAll();
-      let data = [];
-      if (Array.isArray(res)) {
-        data = res;
-      } else if (res?.data && Array.isArray(res.data)) {
-        data = res.data;
-      }
-      setRoomTypes(data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách loại phòng:", error);
-    }
-  };
-
-  useEffect(() => {
-    const initFetch = async () => {
-      await fetchRoomTypes();
-    };
-    initFetch();
-  }, []);
+  // isSaving/isDeleting lấy từ mutation state
+  const isSaving = createRoomTypeMutation.isPending || updateRoomTypeMutation.isPending;
+  const isDeleting = deleteRoomTypeMutation.isPending;
 
   const formatMoney = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 
@@ -193,7 +179,6 @@ function RoomTypeSettings() {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       const dataToSubmit = new FormData();
       dataToSubmit.append('name', String(formData.name).trim());
@@ -219,23 +204,19 @@ function RoomTypeSettings() {
       let savedId = selectedRoom?.id;
 
       if (selectedRoom) {
-        await roomTypeApi.update(selectedRoom.id, dataToSubmit);
+        await updateRoomTypeMutation.mutateAsync({ id: selectedRoom.id, formData: dataToSubmit });
       } else {
-        const created = await roomTypeApi.create(dataToSubmit);
+        const created = await createRoomTypeMutation.mutateAsync(dataToSubmit);
         const createdData = created?.data ?? created;
         savedId = createdData?.id;
       }
-
-      const freshRes = await roomTypeApi.getAll();
-      let freshList = [];
-      if (Array.isArray(freshRes)) {
-        freshList = freshRes;
-      } else if (freshRes?.data && Array.isArray(freshRes.data)) {
-        freshList = freshRes.data;
-      }
-      setRoomTypes(freshList);
+      // Cache được invalidate bởi mutation onSuccess → roomTypes sẽ tự refresh
+      // Hiển thị lại form với data mới từ cache sau khi re-render
 
       if (savedId) {
+        // Refetch để lấy data mới nhất từ server sau khi mutation
+        await queryClient.refetchQueries({ queryKey: QUERY_KEYS.ROOM_TYPES });
+        const freshList = queryClient.getQueryData(QUERY_KEYS.ROOM_TYPES) || [];
         const updatedRoom = freshList.find(r => String(r.id) === String(savedId));
         if (updatedRoom) {
           setSelectedRoom(updatedRoom);
@@ -244,6 +225,7 @@ function RoomTypeSettings() {
           setImagePreview(updatedRoom.room_img_url ? getImageSrc(updatedRoom.room_img_url) : null);
         }
       }
+
 
       setShowSaveModal(false);
       setIsEditing(false);
@@ -257,17 +239,14 @@ function RoomTypeSettings() {
         || "Dữ liệu đầu vào không hợp lệ hoặc Tên loại phòng đã bị trùng.";
       alert(errMsg);
       setShowSaveModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await roomTypeApi.delete(selectedRoom.id);
-      await fetchRoomTypes();
+      await deleteRoomTypeMutation.mutateAsync(selectedRoom.id);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setSelectedRoom(null); // Quay về grid sau khi xóa
       setShowSuccessModal(true);
@@ -275,8 +254,6 @@ function RoomTypeSettings() {
       console.error("Lỗi khi xóa:", error);
       alert("Lỗi khi xóa.");
       setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
     }
   };
 

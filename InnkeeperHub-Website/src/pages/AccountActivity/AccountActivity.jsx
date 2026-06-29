@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import activityApi from '../../api/activityApi';
+import { useState, useMemo, useRef } from 'react';
+import { useActivityLogsQuery, useDeleteActivityLogs } from '../../hooks/useActivity';
 import './AccountActivity.css';
 
 // =============================================
@@ -40,9 +40,11 @@ const getTodayStr = () => new Date().toISOString().split('T')[0];
 // COMPONENT CHÍNH
 // =============================================
 function AccountActivity() {
-  const [logs, setLogs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  // ===== TANSTACK QUERY =====
+  const { data: logs = [], isLoading, error: queryError } = useActivityLogsQuery(500, 0);
+  const deleteActivityMutation = useDeleteActivityLogs();
+
+  const error = queryError ? 'Không thể tải dữ liệu nhật ký. Kiểm tra kết nối máy chủ.' : '';
 
   // Phân trang
   const PAGE_SIZE = 30;
@@ -64,35 +66,13 @@ function AccountActivity() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [deleteBeforeDate, setDeleteBeforeDate] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  const isDeleting = deleteActivityMutation.isPending;
 
   // Lấy thông tin người đang đăng nhập
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
   const isAdmin = currentUser.role === 'ADMIN';
-
-  // ===== FETCH =====
-  const fetchLogs = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const res = await activityApi.getAll(500, 0);
-      if (res?.data) setLogs(res.data);
-      else if (Array.isArray(res)) setLogs(res);
-    } catch (err) {
-      setError('Không thể tải dữ liệu nhật ký. Kiểm tra kết nối máy chủ.');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const initFetch = async () => {
-      await fetchLogs();
-    };
-    initFetch();
-  }, []);
 
 
   // ===== LỌC DỮ LIỆU =====
@@ -156,17 +136,14 @@ function AccountActivity() {
       return;
     }
     if (isDeleting) return;
-    setIsDeleting(true);
     setDeleteError('');
     try {
-      await activityApi.deleteByDateRange(deleteBeforeDate);
+      await deleteActivityMutation.mutateAsync(deleteBeforeDate);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setShowDeleteSuccess(true);
-      await fetchLogs();
     } catch (err) {
       setDeleteError(err.response?.data?.message || 'Lỗi khi xóa. Vui lòng thử lại.');
-    } finally {
-      setIsDeleting(false);
     }
   };
 

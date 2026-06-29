@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import billPaymentsApi from '../../api/billPaymentsApi';
+import { useState, useEffect, useRef } from 'react';
+import { useBillPaymentsLogQuery, useDeleteBillPayment } from '../../hooks/useBillPayments';
 import profileApi from '../../api/profileApi';
 import { printInvoiceFromBill } from './printInvoiceFromBill';
 import './RoomInvoiceLog.css';
@@ -27,19 +27,21 @@ const PAGE_SIZE = 15;
 
 // ── COMPONENT ─────────────────────────────────────────────────────
 function RoomInvoiceLog() {
-  // ── Data ──────────────────────────────────────────────────────
-  const [bills, setBills]           = useState([]);
-  const [isLoading, setIsLoading]   = useState(true);
-  const [error, setError]           = useState('');
-
-  // ── Business info (để in hóa đơn) ────────────────────────────
-  const [businessInfo, setBusinessInfo] = useState(null);
-
   // ── Bộ lọc ───────────────────────────────────────────────────
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch]           = useState('');
   const [dateFrom, setDateFrom]       = useState(getOneMonthAgo());
   const [dateTo, setDateTo]           = useState(getTodayStr());
+
+  // ===== TANSTACK QUERY =====
+  const { data: bills = [], isLoading, error: queryError } = useBillPaymentsLogQuery({ search, dateFrom, dateTo });
+  const deletePaymentMutation = useDeleteBillPayment();
+
+  const isDeleting = deletePaymentMutation.isPending;
+  const error = queryError ? 'Không thể tải dữ liệu. Kiểm tra kết nối máy chủ.' : '';
+
+  // ── Business info (để in hóa đơn) ────────────────────────────
+  const [businessInfo, setBusinessInfo] = useState(null);
 
   // ── Phân trang ────────────────────────────────────────────────
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,7 +61,6 @@ function RoomInvoiceLog() {
   const [showDeleteModal, setShowDeleteModal]   = useState(false);
   const [deleteFrom, setDeleteFrom]             = useState('');
   const [deleteTo, setDeleteTo]                 = useState('');
-  const [isDeleting, setIsDeleting]             = useState(false);
   const [deleteError, setDeleteError]           = useState('');
 
   // ── Quyền ────────────────────────────────────────────────────
@@ -76,25 +77,6 @@ function RoomInvoiceLog() {
       setCurrentPage(1);
     }, 400);
   };
-
-  // ── Fetch danh sách ──────────────────────────────────────────
-  const fetchBills = useCallback(async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const res = await billPaymentsApi.getAll({ search, dateFrom, dateTo, limit: 1000 });
-      const data = res?.data ?? res;
-      const rows = Array.isArray(data?.rows) ? data.rows : (Array.isArray(data) ? data : []);
-      setBills(rows);
-      setCurrentPage(1);
-    } catch {
-      setError('Không thể tải dữ liệu. Kiểm tra kết nối máy chủ.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [search, dateFrom, dateTo]);
-
-  useEffect(() => { fetchBills(); }, [fetchBills]);
 
   useEffect(() => {
     profileApi.getBusinessSettings()
@@ -151,23 +133,18 @@ function RoomInvoiceLog() {
       return;
     }
     if (isDeleting) return;
-    setIsDeleting(true);
     setDeleteError('');
     try {
-      // Xóa từng bill trong khoảng ngày (client-side filter → gọi delete từng cái)
-      // Hoặc nếu backend hỗ trợ bulk delete thì gọi API riêng
-      // Hiện tại: lọc bills trong khoảng ngày rồi xóa từng cái
+      // Lọc bills trong khoảng ngày rồi xóa từng cái
       const toDelete = bills.filter((b) => {
         const d = b.created_at ? new Date(b.created_at).toISOString().split('T')[0] : '';
         return d >= deleteFrom && d <= deleteTo;
       });
-      await Promise.all(toDelete.map((b) => billPaymentsApi.delete(b.id)));
+      await Promise.all(toDelete.map((b) => deletePaymentMutation.mutateAsync(b.id)));
+      // Cache tự động được invalidate sau khi mutation
       setShowDeleteModal(false);
-      await fetchBills();
     } catch (err) {
       setDeleteError(err?.response?.data?.message || 'Có lỗi xảy ra khi xóa. Vui lòng thử lại.');
-    } finally {
-      setIsDeleting(false);
     }
   };
 

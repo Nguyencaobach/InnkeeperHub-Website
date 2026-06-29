@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import staffApi from '../../api/staffApi';
+import { useState } from 'react';
+import { useStaffQuery, useCreateStaff, useUpdateStaff, useDeleteStaff } from '../../hooks/useStaff';
 import './StaffManagement.css';
 
 function StaffManagement() {
-  const [staffList, setStaffList] = useState([]);
+  // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchStaff =====
+  const { data: staffList = [], isLoading: isLoadingStaff } = useStaffQuery();
+  const createStaffMutation = useCreateStaff();
+  const updateStaffMutation = useUpdateStaff();
+  const deleteStaffMutation = useDeleteStaff();
+
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   
@@ -21,9 +26,9 @@ function StaffManagement() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [apiErrorMsg, setApiErrorMsg] = useState('');
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // isSaving/isDeleting lấy trực tiếp từ mutation state
+  const isSaving = createStaffMutation.isPending || updateStaffMutation.isPending;
+  const isDeleting = deleteStaffMutation.isPending;
 
   // Lấy thông tin người đang đăng nhập từ LocalStorage để kiểm tra quyền
   const currentUser = JSON.parse(localStorage.getItem('user')) || {};
@@ -52,21 +57,6 @@ function StaffManagement() {
   // - Tài khoản MANAGER: chỉ ADMIN mới được đổi trạng thái → ẩn nếu người đăng nhập là MANAGER
   const canEditStatus = viewingRole !== 'ADMIN' && !(viewingRole === 'MANAGER' && !isAdmin);
 
-  const fetchStaff = async () => {
-    try {
-      const res = await staffApi.getAll();
-      if (res.data) setStaffList(res.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách nhân viên:", error);
-    }
-  };
-
-  useEffect(() => {
-    const initFetch = async () => {
-      await fetchStaff();
-    };
-    initFetch();
-  }, []); // Xóa cái dòng comment ở ngay trên dòng này đi
 
   // Xử lý Lọc & Tìm kiếm
   let displayStaff = staffList.filter(staff => {
@@ -172,7 +162,6 @@ function StaffManagement() {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       // Chuẩn bị dữ liệu sạch trước khi gửi API
       const cleanData = {
@@ -197,37 +186,31 @@ function StaffManagement() {
       }
 
       if (selectedStaff) {
-        await staffApi.update(selectedStaff.user_id, cleanData);
+        await updateStaffMutation.mutateAsync({ id: selectedStaff.user_id, data: cleanData });
       } else {
-        await staffApi.create(cleanData);
+        await createStaffMutation.mutateAsync(cleanData);
       }
-      
-      await fetchStaff();
+      // Cache tự động được invalidate bởi mutation onSuccess → không cần fetchStaff()
       setShowSaveModal(false);
       setIsEditing(false);
       setShowSuccessModal(true); 
     } catch (error) {
       setApiErrorMsg(error.response?.data?.message || "Có lỗi xảy ra. Kiểm tra lại dữ liệu.");
       setShowSaveModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await staffApi.delete(selectedStaff.user_id);
-      await fetchStaff();
+      await deleteStaffMutation.mutateAsync(selectedStaff.user_id);
+      // Cache tự động được invalidate → không cần fetchStaff()
       setShowDeleteModal(false);
       setSelectedStaff(null);
       setShowSuccessModal(true);
     } catch {
       alert("Lỗi khi khóa tài khoản.");
       setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
     }
   };
 

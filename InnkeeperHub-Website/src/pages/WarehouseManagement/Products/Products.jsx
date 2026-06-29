@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import JsBarcode from 'jsbarcode';
 import { BrowserMultiFormatReader } from '@zxing/browser';
-import productApi from '../../../api/productApi';
+import { useProductsQuery, useCreateProduct, useUpdateProduct, useDeleteProduct } from '../../../hooks/useProducts';
 import { getImageSrc } from '../../../utils/imageUrl';
 import './Products.css';
 
@@ -14,7 +14,14 @@ function Products() {
   const categoryId = location.state?.categoryId;
   const categoryName = location.state?.categoryName || 'Chi tiết danh mục';
 
-  const [productList, setProductList] = useState([]);
+  // ===== TANSTACK QUERY =====
+  // Products.jsx lấy tất cả rồi filter theo categoryId bằng select
+  const { data: productList = [] } = useProductsQuery();
+  const filteredByCategory = productList.filter(p => p.category_id === categoryId);
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
+
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchKeyword, setSearchKeyword] = useState('');
 
@@ -33,9 +40,8 @@ function Products() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const isSaving = createProductMutation.isPending || updateProductMutation.isPending;
+  const isDeleting = deleteProductMutation.isPending;
 
   // ===== States BARCODE MODAL =====
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
@@ -50,32 +56,15 @@ function Products() {
   const codeReaderRef = useRef(null);
   const scannerControlsRef = useRef(null);
 
-  const fetchProducts = async () => {
-    try {
-      const res = await productApi.getAll();
-      if (res.data) {
-        const filtered = res.data.filter(p => p.category_id === categoryId);
-        setProductList(filtered);
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-    }
-  };
-
   useEffect(() => {
     if (!categoryId) {
       navigate('/warehouse/categories');
-      return;
     }
-    const initFetch = async () => {
-      await fetchProducts();
-    };
-    initFetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId, navigate]);
 
   // ===== BỘ LỌC KẾT HỢP (Status + Keyword) =====
-  const displayProducts = productList.filter(product => {
+  const displayProducts = filteredByCategory.filter(product => {
     const matchStatus =
       filterStatus === 'ACTIVE' ? product.is_active === true :
         filterStatus === 'INACTIVE' ? product.is_active === false :
@@ -310,7 +299,6 @@ function Products() {
   const handleSave = async () => {
     if (isSaving) return;
     if (!validateForm()) return;
-    setIsSaving(true);
     try {
       const dataToSubmit = new FormData();
       dataToSubmit.append('category_id', categoryId);
@@ -325,33 +313,28 @@ function Products() {
         dataToSubmit.append('image', formData.imageFile);
       }
       if (isEditing) {
-        await productApi.update(selectedProductId, dataToSubmit);
+        await updateProductMutation.mutateAsync({ id: selectedProductId, data: dataToSubmit });
       } else {
-        await productApi.create(dataToSubmit);
+        await createProductMutation.mutateAsync(dataToSubmit);
       }
-      await fetchProducts();
+      // Cache tự động được invalidate
       setShowFormModal(false);
       setShowSuccessModal(true);
     } catch (error) {
       setApiErrorMsg(error.response?.data?.message || 'Có lỗi xảy ra (Mã SKU có thể đã tồn tại).');
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await productApi.delete(selectedProductId);
-      await fetchProducts();
+      await deleteProductMutation.mutateAsync(selectedProductId);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Lỗi khi xóa:", error);
       alert("Lỗi khi xóa sản phẩm.");
-    } finally {
-      setIsDeleting(false);
     }
   };
 

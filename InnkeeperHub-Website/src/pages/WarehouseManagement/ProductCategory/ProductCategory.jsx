@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import productCategoryApi from '../../../api/productCategoryApi';
+import { useProductCategoriesQuery, useCreateProductCategory, useUpdateProductCategory, useDeleteProductCategory } from '../../../hooks/useProductCategories';
 import './ProductCategory.css';
 
 function ProductCategory() {
   const navigate = useNavigate();
+
+  // ===== TANSTACK QUERY =====
+  const { data: categoryList = [] } = useProductCategoriesQuery();
+  const createCategoryMutation = useCreateProductCategory();
+  const updateCategoryMutation = useUpdateProductCategory();
+  const deleteCategoryMutation = useDeleteProductCategory();
 
   // Kiểm tra đăng nhập (Bảo mật)
   const [user] = useState(() => {
@@ -12,7 +18,6 @@ function ProductCategory() {
     return userData ? JSON.parse(userData) : null;
   });
 
-  const [categoryList, setCategoryList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   
@@ -26,32 +31,13 @@ function ProductCategory() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [apiErrorMsg, setApiErrorMsg] = useState('');
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // 1. Đưa hàm fetchCategories lên trước
-  const fetchCategories = async () => {
-    try {
-      const res = await productCategoryApi.getAll();
-      if (res.data) setCategoryList(res.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh mục:", error);
-    }
-  };
+  const isSaving = createCategoryMutation.isPending || updateCategoryMutation.isPending;
+  const isDeleting = deleteCategoryMutation.isPending;
 
   useEffect(() => {
     if (!user) {
       navigate('/login');
-      return;
     }
-
-    // Bọc vào một hàm async nội bộ để ESLint không bắt lỗi setState đồng bộ nữa
-    const initFetch = async () => {
-      await fetchCategories();
-    };
-
-    initFetch();
   }, [user, navigate]);
 
   // Lọc và tìm kiếm
@@ -111,7 +97,6 @@ function ProductCategory() {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       // Chuẩn bị dữ liệu sạch
       const cleanData = {
@@ -120,29 +105,25 @@ function ProductCategory() {
       };
 
       if (selectedCategory) {
-        await productCategoryApi.update(selectedCategory.category_id, cleanData);
+        await updateCategoryMutation.mutateAsync({ id: selectedCategory.category_id, data: cleanData });
       } else {
-        await productCategoryApi.create(cleanData);
+        await createCategoryMutation.mutateAsync(cleanData);
       }
-      
-      await fetchCategories();
+      // Cache tự động được invalidate
       setShowSaveModal(false);
       setIsEditing(false);
       setShowSuccessModal(true); 
     } catch (error) {
       setApiErrorMsg(error.response?.data?.message || "Có lỗi xảy ra. Tên danh mục có thể bị trùng.");
       setShowSaveModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await productCategoryApi.delete(selectedCategory.category_id);
-      await fetchCategories();
+      await deleteCategoryMutation.mutateAsync(selectedCategory.category_id);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setSelectedCategory(null);
       setShowSuccessModal(true);
@@ -150,8 +131,6 @@ function ProductCategory() {
       const msg = error.response?.data?.message || "Lỗi khi xóa. Có thể danh mục này đang chứa sản phẩm.";
       alert(msg);
       setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
     }
   };
 

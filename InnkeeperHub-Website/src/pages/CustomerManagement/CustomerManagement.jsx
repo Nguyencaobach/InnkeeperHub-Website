@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import customerApi from '../../api/customerApi';
+import { useState } from 'react';
+import { useCustomersQuery, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '../../hooks/useCustomers';
 import './CustomerManagement.css';
 
 function CustomerManagement() {
-  const [customerList, setCustomerList] = useState([]);
+  // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchCustomers =====
+  const { data: customerList = [], isLoading: isLoadingCustomers } = useCustomersQuery();
+  const createCustomerMutation = useCreateCustomer();
+  const updateCustomerMutation = useUpdateCustomer();
+  const deleteCustomerMutation = useDeleteCustomer();
+
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   
@@ -20,25 +25,10 @@ function CustomerManagement() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [apiErrorMsg, setApiErrorMsg] = useState('');
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // isSaving/isDeleting lấy từ mutation state
+  const isSaving = createCustomerMutation.isPending || updateCustomerMutation.isPending;
+  const isDeleting = deleteCustomerMutation.isPending;
 
-  const fetchCustomers = async () => {
-    try {
-      const res = await customerApi.getAll();
-      if (res.data) setCustomerList(res.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách khách hàng:", error);
-    }
-  };
-
-  useEffect(() => {
-    const initFetch = async () => {
-      await fetchCustomers();
-    };
-    initFetch();
-  }, []);
 
   // Xử lý Lọc, Tìm kiếm và SẮP XẾP BẢNG CHỮ CÁI
   let displayCustomers = customerList.filter(customer => {
@@ -137,7 +127,6 @@ function CustomerManagement() {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       // Chuẩn bị dữ liệu sạch trước khi gửi API
       const cleanData = {
@@ -158,37 +147,31 @@ function CustomerManagement() {
       }
 
       if (selectedCustomer) {
-        await customerApi.update(selectedCustomer.customer_id, cleanData);
+        await updateCustomerMutation.mutateAsync({ id: selectedCustomer.customer_id, data: cleanData });
       } else {
-        await customerApi.create(cleanData);
+        await createCustomerMutation.mutateAsync(cleanData);
       }
-      
-      await fetchCustomers();
+      // Cache tự động được invalidate bởi mutation onSuccess
       setShowSaveModal(false);
       setIsEditing(false);
       setShowSuccessModal(true); 
     } catch (error) {
       setApiErrorMsg(error.response?.data?.message || "Có lỗi xảy ra. Kiểm tra lại dữ liệu.");
       setShowSaveModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await customerApi.delete(selectedCustomer.customer_id);
-      await fetchCustomers();
+      await deleteCustomerMutation.mutateAsync(selectedCustomer.customer_id);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setSelectedCustomer(null);
       setShowSuccessModal(true);
     } catch {
       alert("Lỗi khi khóa tài khoản.");
       setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
     }
   };
 

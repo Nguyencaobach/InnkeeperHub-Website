@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import profileApi from '../../api/profileApi';
+import { useProfileQuery, useUpdateProfile, useUploadAvatar, useBusinessSettingsQuery, useUpdateBusinessSettings } from '../../hooks/useProfile';
 import { getImageSrc } from '../../utils/imageUrl';
 import './ProfilePage.css';
 
@@ -41,10 +41,19 @@ function Modal({ icon, iconColor, title, message, onClose, onConfirm, confirmLab
 function PersonalProfileTab({ user, setUser }) {
   const fileInputRef = useRef(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState('');
   const [showAvatarSuccessModal, setShowAvatarSuccessModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // ===== TANSTACK QUERY =====
+  const { data: profileData, isLoading } = useProfileQuery();
+  const updateProfileMutation = useUpdateProfile();
+  const uploadAvatarMutation = useUploadAvatar();
+
+  const isSaving = updateProfileMutation.isPending;
+  const isUploadingAvatar = uploadAvatarMutation.isPending;
+
+  // Khởi tạo form từ data của server
   const [formData, setFormData] = useState({
     full_name: user.full_name || '',
     email: user.email || '',
@@ -54,42 +63,30 @@ function PersonalProfileTab({ user, setUser }) {
     password: '',
   });
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [apiError, setApiError] = useState('');
 
   // Modal states
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Fetch dữ liệu mới nhất từ server khi mở tab
+  // Hydrate form khi profile data load xong
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await profileApi.getMyProfile();
-        const data = res.data;
-        const normalized = {
-          full_name:    data.full_name    || '',
-          email:        data.email        || '',
-          phone_number: data.phone_number || '',
-          gender:       data.gender       || '',
-          address:      data.permanent_address || '',
-          password:     '',
-        };
-        setFormData(normalized);
-        // Đồng bộ lại user state & localStorage
-        const updatedUser = { ...user, ...data };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setUser(updatedUser);
-      } catch (error) {
-        setApiError('Không thể tải thông tin hồ sơ.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProfile();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (profileData?.data) {
+      const data = profileData.data;
+      setFormData({
+        full_name:    data.full_name    || '',
+        email:        data.email        || '',
+        phone_number: data.phone_number || '',
+        gender:       data.gender       || '',
+        address:      data.permanent_address || '',
+        password:     '',
+      });
+      const updatedUser = { ...user, ...data };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -109,7 +106,6 @@ function PersonalProfileTab({ user, setUser }) {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       const payload = {
         full_name: formData.full_name,
@@ -120,8 +116,8 @@ function PersonalProfileTab({ user, setUser }) {
         ...(formData.password ? { password: formData.password } : {}),
       };
 
-      const res = await profileApi.updateMyProfile(payload);
-      const serverData = res.data;
+      const res = await updateProfileMutation.mutateAsync(payload);
+      const serverData = res?.data ?? res;
 
       // Cập nhật lại formData với data thực tế từ server
       const newFormData = {
@@ -146,8 +142,6 @@ function PersonalProfileTab({ user, setUser }) {
     } catch (error) {
       setApiError(error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật hồ sơ.');
       setShowConfirmModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -178,14 +172,13 @@ function PersonalProfileTab({ user, setUser }) {
     // Hiện preview ngay lập tức
     const previewUrl = URL.createObjectURL(file);
     setAvatarPreview(previewUrl);
-    setIsUploadingAvatar(true);
 
     try {
-      const formData = new FormData();
-      formData.append('avatar', file);
+      const fd = new FormData();
+      fd.append('avatar', file);
 
-      const res = await profileApi.uploadAvatar(formData);
-      const serverData = res.data;
+      const res = await uploadAvatarMutation.mutateAsync(fd);
+      const serverData = res?.data ?? res;
 
       // Cập nhật user với avatar_url mới từ server
       const updatedUser = { ...user, avatar_url: serverData.avatar_url };
@@ -200,7 +193,6 @@ function PersonalProfileTab({ user, setUser }) {
       setAvatarError(error.response?.data?.message || 'Không thể upload ảnh. Thử lại sau.');
       setAvatarPreview(null);
     } finally {
-      setIsUploadingAvatar(false);
       // Reset input để chọn lại cùng file nếu muốn
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -416,41 +408,36 @@ function BusinessSettingsTab() {
   const [formData, setFormData] = useState({ ...EMPTY_BUSINESS });
   const [savedData, setSavedData] = useState({ ...EMPTY_BUSINESS });
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  // ===== TANSTACK QUERY =====
+  const { data: businessData, isLoading } = useBusinessSettingsQuery();
+  const updateBusinessMutation = useUpdateBusinessSettings();
+
+  const isSaving = updateBusinessMutation.isPending;
   const [apiError, setApiError] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Fetch thông tin doanh nghiệp khi component mount
+  // Hydrate form khi business data load xong
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await profileApi.getBusinessSettings();
-        const data = res.data || {};
-        const normalized = {
-          business_type:        data.business_type        || '',
-          business_name:        data.business_name        || '',
-          tax_code:             data.tax_code             || '',
-          legal_representative: data.legal_representative || '',
-          business_address:     data.business_address     || '',
-          logo_url:             data.logo_url             || '',
-          bank_account_number:  data.bank_account_number  || '',
-          bank_name:            data.bank_name            || '',
-          bank_account_name:    data.bank_account_name    || '',
-          hotline:              data.hotline              || '',
-          email_contact:        data.email_contact        || '',
-        };
-        setFormData(normalized);
-        setSavedData(normalized);
-      } catch (error) {
-        setApiError('Không thể tải thông tin doanh nghiệp.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    const raw = businessData?.data ?? businessData;
+    if (raw && typeof raw === 'object') {
+      const normalized = {
+        business_type:        raw.business_type        || '',
+        business_name:        raw.business_name        || '',
+        tax_code:             raw.tax_code             || '',
+        legal_representative: raw.legal_representative || '',
+        business_address:     raw.business_address     || '',
+        logo_url:             raw.logo_url             || '',
+        bank_account_number:  raw.bank_account_number  || '',
+        bank_name:            raw.bank_name            || '',
+        bank_account_name:    raw.bank_account_name    || '',
+        hotline:              raw.hotline              || '',
+        email_contact:        raw.email_contact        || '',
+      };
+      setFormData(normalized);
+      setSavedData(normalized);
+    }
+  }, [businessData]);
 
   const hasData = Object.values(formData).some(v => v !== '');
 
@@ -476,10 +463,9 @@ function BusinessSettingsTab() {
 
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
-      const res = await profileApi.updateBusinessSettings(formData);
-      const updated = res.data || formData;
+      const res = await updateBusinessMutation.mutateAsync(formData);
+      const updated = res?.data ?? res ?? formData;
       const normalized = {
         business_type:        updated.business_type        || '',
         business_name:        updated.business_name        || '',
@@ -501,8 +487,6 @@ function BusinessSettingsTab() {
     } catch (error) {
       setApiError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu thông tin doanh nghiệp.');
       setShowConfirmModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 

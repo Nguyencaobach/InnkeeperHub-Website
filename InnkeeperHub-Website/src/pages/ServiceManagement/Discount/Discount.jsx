@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import discountApi from '../../../api/discountApi';
+import { useState } from 'react';
+import { useDiscountsQuery, useCreateDiscount, useUpdateDiscount, useDeleteDiscount } from '../../../hooks/useDiscounts';
 import './Discount.css';
 
 function Discount() {
-  const [discounts, setDiscounts] = useState([]);
+  // ===== TANSTACK QUERY =====
+  const { data: discounts = [] } = useDiscountsQuery();
+  const createDiscountMutation = useCreateDiscount();
+  const updateDiscountMutation = useUpdateDiscount();
+  const deleteDiscountMutation = useDeleteDiscount();
+
   const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
@@ -15,26 +20,8 @@ function Discount() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // States loading (chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // ===== FETCH =====
-  const fetchDiscounts = async () => {
-    try {
-      const res = await discountApi.getAll();
-      if (res.data) setDiscounts(res.data);
-    } catch (error) {
-      console.error('Lỗi khi lấy danh sách mã giảm giá:', error);
-    }
-  };
-
-  useEffect(() => {
-    const init = async () => {
-      await fetchDiscounts();
-    };
-    init();
-  }, []);
+  const isSaving = createDiscountMutation.isPending || updateDiscountMutation.isPending;
+  const isDeleting = deleteDiscountMutation.isPending;
 
   // ===== HELPERS =====
   // Format tiền tệ
@@ -136,7 +123,6 @@ function Discount() {
   // ===== CALL API =====
   const confirmSave = async () => {
     if (isSaving) return;
-    setIsSaving(true);
     try {
       const payload = {
         code: formData.code.trim(),
@@ -150,14 +136,13 @@ function Discount() {
       if (formData.usage_limit) payload.usage_limit = Number(formData.usage_limit);
 
       if (selectedDiscount) {
-        await discountApi.update(selectedDiscount.discount_id, payload);
+        await updateDiscountMutation.mutateAsync({ id: selectedDiscount.discount_id, data: payload });
         setSuccessMessage('Cập nhật mã giảm giá thành công!');
       } else {
-        await discountApi.create(payload);
+        await createDiscountMutation.mutateAsync(payload);
         setSuccessMessage('Tạo mới mã giảm giá thành công!');
       }
 
-      await fetchDiscounts();
       setShowSaveModal(false);
       setIsEditing(false);
       setShowSuccessModal(true);
@@ -165,17 +150,13 @@ function Discount() {
       console.error('Lỗi khi lưu:', error);
       alert(error.response?.data?.message || 'Lỗi hệ thống. Vui lòng thử lại.');
       setShowSaveModal(false);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await discountApi.delete(selectedDiscount.discount_id);
-      await fetchDiscounts();
+      await deleteDiscountMutation.mutateAsync(selectedDiscount.discount_id);
       setShowDeleteModal(false);
       setSelectedDiscount(null);
       setSuccessMessage('Xóa mã giảm giá thành công!');
@@ -184,8 +165,6 @@ function Discount() {
       console.error('Lỗi khi xóa:', error);
       alert('Lỗi khi xóa. Không thể kết nối với máy chủ.');
       setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
     }
   };
 

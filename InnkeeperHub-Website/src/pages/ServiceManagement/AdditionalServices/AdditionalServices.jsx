@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import additionalServiceApi from '../../../api/additionalServiceApi';
+import { useState } from 'react';
+import { useAdditionalServicesQuery, useCreateAdditionalService, useUpdateAdditionalService, useDeleteAdditionalService } from '../../../hooks/useAdditionalServices';
 import { getImageSrc } from '../../../utils/imageUrl';
 import './AdditionalServices.css';
 
@@ -11,8 +11,13 @@ const SERVICE_CATEGORIES = [
 ];
 
 function AdditionalServices() {
-  const [services, setServices] = useState([]);
+  // ===== TANSTACK QUERY =====
   const [activeTab, setActiveTab] = useState(SERVICE_CATEGORIES[0].id);
+  const { data: services = [] } = useAdditionalServicesQuery(activeTab);
+  const createServiceMutation = useCreateAdditionalService();
+  const updateServiceMutation = useUpdateAdditionalService();
+  const deleteServiceMutation = useDeleteAdditionalService();
+
   const [searchKeyword, setSearchKeyword] = useState('');
 
   // States Modal Form
@@ -31,27 +36,8 @@ function AdditionalServices() {
   const [apiErrorMsg, setApiErrorMsg] = useState('');
 
   // States Loading (Chống spam click)
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Gọi API lấy danh sách dịch vụ theo Nhóm (Tab) đang chọn
-  const fetchServices = useCallback(async () => {
-    try {
-      const res = await additionalServiceApi.getAll(activeTab);
-      if (res.data) setServices(res.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách dịch vụ:", error);
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    // Bọc vào một hàm async nội bộ để qua mặt ESLint
-    const initFetch = async () => {
-      await fetchServices();
-    };
-    
-    initFetch();
-  }, [fetchServices]);
+  const isSaving = createServiceMutation.isPending || updateServiceMutation.isPending;
+  const isDeleting = deleteServiceMutation.isPending;
 
   // Bộ lọc tìm kiếm
   const displayServices = services.filter(srv => {
@@ -150,7 +136,6 @@ function AdditionalServices() {
   const handleSave = async () => {
     if (isSaving) return;
     if (!validateForm()) return;
-    setIsSaving(true);
     
     try {
       const dataToSubmit = new FormData();
@@ -168,34 +153,28 @@ function AdditionalServices() {
       }
 
       if (isEditing) {
-        await additionalServiceApi.update(selectedServiceId, dataToSubmit);
+        await updateServiceMutation.mutateAsync({ id: selectedServiceId, data: dataToSubmit });
       } else {
-        await additionalServiceApi.create(dataToSubmit);
+        await createServiceMutation.mutateAsync(dataToSubmit);
       }
-
-      await fetchServices(); // Cập nhật lại danh sách
+      // Cache tự động được invalidate
       setShowFormModal(false);
       setShowSuccessModal(true);
     } catch (error) {
       setApiErrorMsg(error.response?.data?.message || 'Có lỗi xảy ra (Tên dịch vụ có thể bị trùng).');
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await additionalServiceApi.delete(selectedServiceId);
-      await fetchServices();
+      await deleteServiceMutation.mutateAsync(selectedServiceId);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Lỗi khi xóa:", error);
       alert("Lỗi khi xóa dịch vụ.");
-    } finally {
-      setIsDeleting(false);
     }
   };
 

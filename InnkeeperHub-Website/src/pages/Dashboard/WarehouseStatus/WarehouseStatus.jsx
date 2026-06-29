@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import warehouseStatusApi from '../../../api/warehouseStatusApi';
+import { useState } from 'react';
+import { useWarehouseStatusQuery, useDiscardBatch } from '../../../hooks/useWarehouseStatus';
 import { getImageSrc } from '../../../utils/imageUrl';
 import './WarehouseStatus.css';
 
@@ -10,11 +10,10 @@ const TABS = [
 ];
 
 function WarehouseStatus() {
-  const [data, setData] = useState({
-    lowStockAlert: [],
-    expiringAlert: [],
-    lockedBatches: []
-  });
+  // ===== TANSTACK QUERY =====
+  const { data = { lowStockAlert: [], expiringAlert: [], lockedBatches: [] } } = useWarehouseStatusQuery();
+  const discardBatchMutation = useDiscardBatch();
+
   const [activeTab, setActiveTab] = useState('LOW_STOCK');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [lowStockFilter, setLowStockFilter] = useState('ALL'); // 'ALL' | 'OUT_OF_STOCK' | 'LOW_STOCK'
@@ -26,29 +25,10 @@ function WarehouseStatus() {
   const [discardError, setDiscardError] = useState('');
 
   // States Loading & Success
-  const [isSaving, setIsSaving] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Gọi API lấy dữ liệu Dashboard
-  const fetchDashboardData = useCallback(async () => {
-    try {
-      const res = await warehouseStatusApi.getDashboard();
-      if (res.data) {
-        setData(res.data);
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu kho:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Bọc hàm async để vượt qua cảnh báo của ESLint
-    const initFetch = async () => {
-      await fetchDashboardData();
-    };
-    initFetch();
-  }, [fetchDashboardData]);
+  const isSaving = discardBatchMutation.isPending;
 
   // Hàm Helpers định dạng ngày tháng VN (DD/MM/YYYY)
   const formatDateVN = (dateStr) => {
@@ -98,20 +78,16 @@ function WarehouseStatus() {
       return;
     }
 
-    setIsSaving(true);
     setDiscardError('');
 
     try {
-      await warehouseStatusApi.discardBatch(selectedBatch.batch_id, { reason: discardReason.trim() });
-
-      await fetchDashboardData(); // Cập nhật lại 3 bảng
+      await discardBatchMutation.mutateAsync({ batchId: selectedBatch.batch_id, data: { reason: discardReason.trim() } });
+      // Cache tự động được invalidate
       setShowDiscardModal(false);
       setSuccessMsg(`Đã tiêu hủy lô hàng ${selectedBatch.batch_code} thành công.`);
       setShowSuccessModal(true);
     } catch (error) {
       setDiscardError(error.response?.data?.message || 'Có lỗi xảy ra khi tiêu hủy.');
-    } finally {
-      setIsSaving(false);
     }
   };
 

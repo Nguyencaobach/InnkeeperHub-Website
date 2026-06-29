@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import productBatchApi from '../../../api/productBatchApi';
+import { useProductBatchesQuery, useCreateProductBatch, useUpdateProductBatch, useDeleteProductBatch } from '../../../hooks/useProductBatches';
 import './ProductBatches.css';
 
 // ===== HELPERS =====
@@ -43,8 +43,12 @@ function ProductBatches() {
   const productId = location.state?.productId;
   const productName = location.state?.productName || 'Chi tiết sản phẩm';
 
-  // ===== Data states =====
-  const [batchList, setBatchList] = useState([]);
+  // ===== TANSTACK QUERY =====
+  const { data: batchList = [] } = useProductBatchesQuery(productId);
+  const createBatchMutation = useCreateProductBatch();
+  const updateBatchMutation = useUpdateProductBatch();
+  const deleteBatchMutation = useDeleteProductBatch();
+
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchKeyword, setSearchKeyword] = useState('');
 
@@ -66,27 +70,13 @@ function ProductBatches() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // ===== Loading (chống spam click) =====
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // ===== FETCH =====
-  const fetchBatches = async () => {
-    try {
-      const res = await productBatchApi.getByProductId(productId);
-      // axiosClient interceptor trả về response.data, nhưng route này trả về { data: [...] }
-      const list = res?.data ?? res ?? [];
-      setBatchList(Array.isArray(list) ? list : []);
-    } catch (err) {
-      console.error('Lỗi khi lấy danh sách lô hàng:', err);
-    }
-  };
+  const isSaving = createBatchMutation.isPending || updateBatchMutation.isPending;
+  const isDeleting = deleteBatchMutation.isPending;
 
   useEffect(() => {
     if (!productId) {
       navigate('/warehouse/categories');
-      return;
     }
-    fetchBatches();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId, navigate]);
 
@@ -193,7 +183,6 @@ function ProductBatches() {
   const handleSave = async () => {
     if (isSaving) return;
     if (!validateForm()) return;
-    setIsSaving(true);
     try {
       const payload = {
         product_id: productId,
@@ -206,34 +195,29 @@ function ProductBatches() {
         status: formData.status,
       };
       if (isEditing) {
-        await productBatchApi.update(selectedBatchId, payload);
+        await updateBatchMutation.mutateAsync({ id: selectedBatchId, data: payload });
       } else {
-        await productBatchApi.create(payload);
+        await createBatchMutation.mutateAsync(payload);
       }
-      await fetchBatches();
+      // Cache tự động được invalidate
       setShowFormModal(false);
       setShowSuccessModal(true);
     } catch (err) {
       setApiErrorMsg(err.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại.');
-    } finally {
-      setIsSaving(false);
     }
   };
 
   // ===== DELETE =====
   const confirmDelete = async () => {
     if (isDeleting) return;
-    setIsDeleting(true);
     try {
-      await productBatchApi.delete(selectedBatchId);
-      await fetchBatches();
+      await deleteBatchMutation.mutateAsync(selectedBatchId);
+      // Cache tự động được invalidate
       setShowDeleteModal(false);
       setShowSuccessModal(true);
     } catch (err) {
       console.error('Lỗi khi xóa lô hàng:', err);
       alert('Lỗi khi xóa lô hàng.');
-    } finally {
-      setIsDeleting(false);
     }
   };
 
