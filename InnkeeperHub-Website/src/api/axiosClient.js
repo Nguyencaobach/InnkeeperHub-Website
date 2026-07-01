@@ -6,9 +6,9 @@ const axiosClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true', // Bỏ trang cảnh báo ngrok free
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
+    
+    // ĐÃ XÓA CÁC HEADER CHỐNG CACHE ('Cache-Control', 'Pragma', 'Expires')
+    // Để cho phép Web nhận Cache hợp lệ từ Backend giúp tăng tốc độ load
   },
 });
 
