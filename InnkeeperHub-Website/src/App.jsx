@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage/LoginPage';
 import MainLayout from './components/Layout/MainLayout';
+import ProtectedRoute from './components/Layout/ProtectedRoute';
 import HomePage from './pages/HomePage/HomePage';
 import RoomTypeSettings from './pages/RoomManagement/RoomTypeSettings/RoomTypeSettings';
 import RoomDetail from './pages/RoomManagement/RoomDetail/RoomDetail';
@@ -24,8 +25,10 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import NgrokGate from './components/NgrokGate/NgrokGate';
 import ReserveBookingPage from './pages/RoomManagement/ReserveBooking/ReserveBookingPage';
 
-
 function App() {
+  const userData = localStorage.getItem('user');
+  const userRole = userData ? JSON.parse(userData)?.role : null;
+
   return (
     <NgrokGate>
       <BrowserRouter>
@@ -35,32 +38,48 @@ function App() {
 
           {/* Cụm Route ĐƯỢC BỌC BỞI LAYOUT */}
           <Route element={<MainLayout />}>
-            <Route path="/dashboard" element={<HomePage />} />
-            <Route path="/rooms/settings" element={<RoomTypeSettings />} />
-            <Route path="/rooms/details/:id" element={<RoomDetail />} />
-            <Route path="rooms/activities" element={<RoomTypeOverview />} />
-            <Route path="rooms/activities/list/:id" element={<RoomDetailOverview />} />
-            <Route path="rooms/activities/list/:id/create-booking" element={<CreateBooking />} />
-            <Route path="rooms/activities/list/:id/view-booking" element={<ViewBooking />} />
-            <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
-            <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
-            <Route path="rooms/activities/list/:id/reserved-bookings" element={<ReserveBookingPage />} />
-            <Route path="/staff-management/account" element={<StaffManagement />} />
-            <Route path="/staff-management/timekeeping" element={<StaffManagement />} />
-            <Route path="/customers" element={<CustomerManagement />} />
-            <Route path="/warehouse/categories" element={<ProductCategory />} />
-            <Route path="/warehouse/products" element={<Products />} />
-            <Route path="/warehouse/product-batches" element={<ProductBatches />} />
-            <Route path="/services/discount" element={<Discount />} />
-            <Route path="/services/additional" element={<AdditionalServices />} />
-            <Route path="/records/account-logs" element={<AccountActivity />} />
-            <Route path="/records/room-invoices" element={<RoomInvoiceLog />} />
-            <Route path="/dashboard/warehouse-status" element={<WarehouseStatus />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            
+            {/* --- DASHBOARD: Admin, Manager --- */}
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']} />}>
+              <Route path="/dashboard" element={<HomePage />} />
+              <Route path="/dashboard/warehouse-status" element={<WarehouseStatus />} />
+            </Route>
+
+            {/* --- ROOM ACTIVITIES: Admin, Manager, Staff --- */}
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'STAFF']} />}>
+              <Route path="rooms/activities" element={<RoomTypeOverview />} />
+              <Route path="rooms/activities/list/:id" element={<RoomDetailOverview />} />
+              <Route path="rooms/activities/list/:id/create-booking" element={<CreateBooking />} />
+              <Route path="rooms/activities/list/:id/view-booking" element={<ViewBooking />} />
+              <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
+              <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
+              <Route path="rooms/activities/list/:id/reserved-bookings" element={<ReserveBookingPage />} />
+              <Route path="/customers" element={<CustomerManagement />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+
+            {/* --- ADMIN ONLY --- */}
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+              <Route path="/rooms/settings" element={<RoomTypeSettings />} />
+              <Route path="/rooms/details/:id" element={<RoomDetail />} />
+              <Route path="/staff-management/account" element={<StaffManagement />} />
+              <Route path="/staff-management/timekeeping" element={<StaffManagement />} />
+            </Route>
+
+            {/* --- ADMIN & MANAGER --- */}
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']} />}>
+              <Route path="/warehouse/categories" element={<ProductCategory />} />
+              <Route path="/warehouse/products" element={<Products />} />
+              <Route path="/warehouse/product-batches" element={<ProductBatches />} />
+              <Route path="/services/discount" element={<Discount />} />
+              <Route path="/services/additional" element={<AdditionalServices />} />
+              <Route path="/records/account-logs" element={<AccountActivity />} />
+              <Route path="/records/room-invoices" element={<RoomInvoiceLog />} />
+            </Route>
           </Route>
 
           {/* Mặc định: chuyển về dashboard hoặc login */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to={userRole === 'STAFF' ? "/rooms/activities" : "/dashboard"} replace />} />
         </Routes>
       </BrowserRouter>
     </NgrokGate>

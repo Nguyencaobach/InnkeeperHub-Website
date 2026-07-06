@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProfileQuery } from '../../hooks/useProfile';
 import './MainLayout.css';
 
@@ -22,6 +23,7 @@ function MainLayout() {
 
   // Dùng TanStack Query để luôn có profile mới nhất (bao gồm avatar_url)
   const { data: profileData } = useProfileQuery();
+  const queryClient = useQueryClient();
 
   // avatar_url: ưu tiên data từ server (profileData.data), fallback về localStorage
   // axiosClient interceptor trả về response.data → profileData = { success, data: {...} }
@@ -68,6 +70,7 @@ function MainLayout() {
   const confirmLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
+    queryClient.clear(); // Clear cached data so other users don't see stale data
     navigate('/login');
   };
 
@@ -99,97 +102,124 @@ function MainLayout() {
         </div>
 
         <nav className="sidebar-nav">
-          <div className="nav-group">
-            <div className={`nav-item ${openMenu === 'dashboard' ? 'active' : ''}`} onClick={() => toggleMenu('dashboard')}>
-              <div className="nav-item-content">
-                <i className="ph ph-squares-four"></i>
-                <span>Dashboard</span>
+          {/* Dashboard: ADMIN, MANAGER */}
+          {['ADMIN', 'MANAGER'].includes(user.role) && (
+            <div className="nav-group">
+              <div className={`nav-item ${openMenu === 'dashboard' ? 'active' : ''}`} onClick={() => toggleMenu('dashboard')}>
+                <div className="nav-item-content">
+                  <i className="ph ph-squares-four"></i>
+                  <span>Dashboard</span>
+                </div>
+                <i className={`ph ph-caret-down chevron ${openMenu === 'dashboard' ? 'open' : ''}`}></i>
               </div>
-              <i className={`ph ph-caret-down chevron ${openMenu === 'dashboard' ? 'open' : ''}`}></i>
-            </div>
-            <div className={`sub-menu ${openMenu === 'dashboard' ? 'show' : ''}`}>
-              <NavLink to="/dashboard/revenue" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Doanh thu</NavLink>
-              <NavLink to="/dashboard/warehouse-status" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Tình trạng kho hàng</NavLink>
-              <NavLink to="/dashboard/calender" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Lịch tổng quan</NavLink>
-            </div>
-          </div>
-
-          <div className="nav-group">
-            <div className={`nav-item ${openMenu === 'rooms' ? 'active' : ''}`} onClick={() => toggleMenu('rooms')}>
-              <div className="nav-item-content">
-                <i className="ph ph-bed"></i>
-                <span>Quản lý phòng</span>
+              <div className={`sub-menu ${openMenu === 'dashboard' ? 'show' : ''}`}>
+                <NavLink to="/dashboard/revenue" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Doanh thu</NavLink>
+                <NavLink to="/dashboard/warehouse-status" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Tình trạng kho hàng</NavLink>
+                <NavLink to="/dashboard/calender" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Lịch tổng quan</NavLink>
               </div>
-              <i className={`ph ph-caret-down chevron ${openMenu === 'rooms' ? 'open' : ''}`}></i>
             </div>
-            <div className={`sub-menu ${openMenu === 'rooms' ? 'show' : ''}`}>
-              <NavLink to="/rooms/settings" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt phòng</NavLink>
-              <NavLink to="/rooms/activities" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động phòng</NavLink>
-            </div>
-          </div>
+          )}
 
-          <div className="nav-group">
-            <div className={`nav-item ${openMenu === 'staff-management' ? 'active' : ''}`} onClick={() => toggleMenu('staff-management')}>
-              <div className="nav-item-content">
-                <i className="ph ph-users-three"></i>
-                <span>Quản lý nhân viên</span>
+          {/* Quản lý phòng: ADMIN, MANAGER, STAFF */}
+          {['ADMIN', 'MANAGER', 'STAFF'].includes(user.role) && (
+            <div className="nav-group">
+              <div className={`nav-item ${openMenu === 'rooms' ? 'active' : ''}`} onClick={() => toggleMenu('rooms')}>
+                <div className="nav-item-content">
+                  <i className="ph ph-bed"></i>
+                  <span>Quản lý phòng</span>
+                </div>
+                <i className={`ph ph-caret-down chevron ${openMenu === 'rooms' ? 'open' : ''}`}></i>
               </div>
-              <i className={`ph ph-caret-down chevron ${openMenu === 'staff-management' ? 'open' : ''}`}></i>
+              <div className={`sub-menu ${openMenu === 'rooms' ? 'show' : ''}`}>
+                {/* Cài đặt phòng: Chỉ ADMIN */}
+                {user.role === 'ADMIN' && (
+                  <NavLink to="/rooms/settings" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt phòng</NavLink>
+                )}
+                <NavLink to="/rooms/activities" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động phòng</NavLink>
+              </div>
             </div>
-            <div className={`sub-menu ${openMenu === 'staff-management' ? 'show' : ''}`}>
-              <NavLink to="/staff-management/account" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt tài khoản</NavLink>
-              <NavLink to="/staff-management/timekeeping" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Chấm công</NavLink>
-            </div>
-          </div>
+          )}
 
-          <NavLink to="/customers" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-            <div className="nav-item-content">
-              <i className="ph ph-bold ph-user-focus"></i>
-              <span>Quản lý khách hàng</span>
+          {/* Quản lý nhân viên: Chỉ ADMIN */}
+          {user.role === 'ADMIN' && (
+            <div className="nav-group">
+              <div className={`nav-item ${openMenu === 'staff-management' ? 'active' : ''}`} onClick={() => toggleMenu('staff-management')}>
+                <div className="nav-item-content">
+                  <i className="ph ph-users-three"></i>
+                  <span>Quản lý nhân viên</span>
+                </div>
+                <i className={`ph ph-caret-down chevron ${openMenu === 'staff-management' ? 'open' : ''}`}></i>
+              </div>
+              <div className={`sub-menu ${openMenu === 'staff-management' ? 'show' : ''}`}>
+                <NavLink to="/staff-management/account" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt tài khoản</NavLink>
+                <NavLink to="/staff-management/timekeeping" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Chấm công</NavLink>
+              </div>
             </div>
-          </NavLink>
+          )}
+
+          {/* Quản lý khách hàng: ADMIN, MANAGER, STAFF */}
+          {['ADMIN', 'MANAGER', 'STAFF'].includes(user.role) && (
+            <NavLink to="/customers" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+              <div className="nav-item-content">
+                <i className="ph ph-bold ph-user-focus"></i>
+                <span>Quản lý khách hàng</span>
+              </div>
+            </NavLink>
+          )}
           
-          <a href="https://my.payos.vn" target="_blank" rel="noopener noreferrer" className="nav-item">
-            <div className="nav-item-content">
-              <i className="ph-bold ph-bank"></i>
-              <span>Quản lý giao dịch</span>
-            </div>
-          </a>
-
-          <NavLink to="/warehouse/categories" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-            <div className="nav-item-content">
-              <i className="ph ph-bold ph-warehouse"></i>
-              <span>Quản lý xuất nhập kho</span>
-            </div>
-          </NavLink>
-
-          <div className="nav-group">
-            <div className={`nav-item ${openMenu === 'services' ? 'active' : ''}`} onClick={() => toggleMenu('services')}>
+          {/* Quản lý giao dịch (PayOS): Chỉ ADMIN */}
+          {user.role === 'ADMIN' && (
+            <a href="https://my.payos.vn" target="_blank" rel="noopener noreferrer" className="nav-item">
               <div className="nav-item-content">
-                <i className="ph-bold ph-dropbox-logo"></i>
-                <span>Quản lý dịch vụ</span>
+                <i className="ph-bold ph-bank"></i>
+                <span>Quản lý giao dịch</span>
               </div>
-              <i className={`ph ph-caret-down chevron ${openMenu === 'services' ? 'open' : ''}`}></i>
-            </div>
-            <div className={`sub-menu ${openMenu === 'services' ? 'show' : ''}`}>
-              <NavLink to="/services/discount" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Khuyến mãi</NavLink>
-              <NavLink to="/services/additional" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Dịch vụ khác</NavLink>
-            </div>
-          </div>
+            </a>
+          )}
 
-          <div className="nav-group">
-            <div className={`nav-item ${openMenu === 'records' ? 'active' : ''}`} onClick={() => toggleMenu('records')}>
+          {/* Quản lý xuất nhập kho: ADMIN, MANAGER */}
+          {['ADMIN', 'MANAGER'].includes(user.role) && (
+            <NavLink to="/warehouse/categories" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
               <div className="nav-item-content">
-                <i className="ph-bold ph-clock-user"></i>
-                <span>Quản lý hoạt động</span>
+                <i className="ph ph-bold ph-warehouse"></i>
+                <span>Quản lý xuất nhập kho</span>
               </div>
-              <i className={`ph ph-caret-down chevron ${openMenu === 'records' ? 'open' : ''}`}></i>
+            </NavLink>
+          )}
+
+          {/* Quản lý dịch vụ: ADMIN, MANAGER */}
+          {['ADMIN', 'MANAGER'].includes(user.role) && (
+            <div className="nav-group">
+              <div className={`nav-item ${openMenu === 'services' ? 'active' : ''}`} onClick={() => toggleMenu('services')}>
+                <div className="nav-item-content">
+                  <i className="ph-bold ph-dropbox-logo"></i>
+                  <span>Quản lý dịch vụ</span>
+                </div>
+                <i className={`ph ph-caret-down chevron ${openMenu === 'services' ? 'open' : ''}`}></i>
+              </div>
+              <div className={`sub-menu ${openMenu === 'services' ? 'show' : ''}`}>
+                <NavLink to="/services/discount" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Khuyến mãi</NavLink>
+                <NavLink to="/services/additional" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Dịch vụ khác</NavLink>
+              </div>
             </div>
-            <div className={`sub-menu ${openMenu === 'records' ? 'show' : ''}`}>
-              <NavLink to="/records/room-invoices" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Nhật ký phòng</NavLink>
-              <NavLink to="/records/account-logs" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động tài khoản</NavLink>
+          )}
+
+          {/* Quản lý hoạt động: ADMIN, MANAGER */}
+          {['ADMIN', 'MANAGER'].includes(user.role) && (
+            <div className="nav-group">
+              <div className={`nav-item ${openMenu === 'records' ? 'active' : ''}`} onClick={() => toggleMenu('records')}>
+                <div className="nav-item-content">
+                  <i className="ph-bold ph-clock-user"></i>
+                  <span>Quản lý hoạt động</span>
+                </div>
+                <i className={`ph ph-caret-down chevron ${openMenu === 'records' ? 'open' : ''}`}></i>
+              </div>
+              <div className={`sub-menu ${openMenu === 'records' ? 'show' : ''}`}>
+                <NavLink to="/records/room-invoices" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Nhật ký phòng</NavLink>
+                <NavLink to="/records/account-logs" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động tài khoản</NavLink>
+              </div>
             </div>
-          </div>
+          )}
         </nav>
       </aside>
 
