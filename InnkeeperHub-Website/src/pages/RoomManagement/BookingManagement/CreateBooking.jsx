@@ -78,6 +78,10 @@ function CreateBooking() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdBookingCode, setCreatedBookingCode] = useState('');
 
+  // Conflict modal state
+  const [conflicts, setConflicts] = useState([]);
+  const [showConflictModal, setShowConflictModal] = useState(false);
+
   // ── FETCH ROOM TYPE ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!roomTypeId) return;
@@ -132,6 +136,13 @@ function CreateBooking() {
       newErrors.guestEmail = 'Email không đúng định dạng.';
     }
     if (!checkinDate) newErrors.checkinDate = 'Vui lòng chọn ngày check-in.';
+
+    const checkinMs = checkinDate ? new Date(buildISOFromParts(checkinDate, checkinHour, checkinMinute)).getTime() : 0;
+    const nowMs = Date.now();
+    // Allow 5 minutes grace period
+    if (checkinMs && checkinMs < nowMs - 5 * 60_000) {
+      newErrors.checkinDate = 'Giờ nhận phòng không được là thời gian trong quá khứ.';
+    }
 
     // Kiểm tra thời lượng tối thiểu nếu người dùng đã nhập checkout
     if (checkinDate && checkoutDate) {
@@ -212,11 +223,16 @@ function CreateBooking() {
 
       setShowSuccess(true);
     } catch (error) {
-      const msg =
-        error?.response?.data?.message ||
-        error?.message ||
-        'Không thể tạo phiên thuê. Vui lòng thử lại.';
-      alert(`❌ Lỗi: ${msg}`);
+      if (error?.response?.status === 409 && error?.response?.data?.conflicts) {
+        setConflicts(error.response.data.conflicts);
+        setShowConflictModal(true);
+      } else {
+        const msg =
+          error?.response?.data?.message ||
+          error?.message ||
+          'Không thể tạo phiên thuê. Vui lòng thử lại.';
+        alert(`❌ Lỗi: ${msg}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -305,7 +321,7 @@ function CreateBooking() {
                 <label className="cb-label">Ảnh CCCD (Mặt Trước)</label>
                 <div
                   className={`cb-cccd-preview ${cccdFrontPreview ? 'has-image' : ''}`}
-                  style={cccdFrontPreview ? { backgroundImage: `url(${cccdFrontPreview})` } : {}}
+                  style={cccdFrontPreview ? { backgroundImage: `url('${cccdFrontPreview}')` } : {}}
                 >
                   {!cccdFrontPreview && (
                     <span className="cb-cccd-placeholder">
@@ -333,7 +349,7 @@ function CreateBooking() {
                 <label className="cb-label">Ảnh CCCD (Mặt Sau)</label>
                 <div
                   className={`cb-cccd-preview ${cccdBackPreview ? 'has-image' : ''}`}
-                  style={cccdBackPreview ? { backgroundImage: `url(${cccdBackPreview})` } : {}}
+                  style={cccdBackPreview ? { backgroundImage: `url('${cccdBackPreview}')` } : {}}
                 >
                   {!cccdBackPreview && (
                     <span className="cb-cccd-placeholder">
@@ -556,6 +572,52 @@ function CreateBooking() {
             >
               Đóng
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* CONFLICT MODAL */}
+      {showConflictModal && (
+        <div className="cb-success-overlay">
+          <div className="cb-success-modal" style={{ maxWidth: '750px', textAlign: 'left' }}>
+            <div className="cb-modal-icon cb-modal-icon--error">
+              <i className="ph-bold ph-warning-circle"></i>
+            </div>
+            <h2 className="cb-modal-title" style={{ textAlign: 'center', color: '#dc2626' }}>Trùng lịch đặt trước</h2>
+            <p className="cb-modal-text" style={{ textAlign: 'center', marginBottom: '20px' }}>
+              Không thể tạo phiên thuê do phòng đã có khách đặt trước trong khoảng thời gian này.
+            </p>
+
+            <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', marginBottom: '20px', maxHeight: '300px', overflowY: 'auto' }}>
+              {conflicts.map((c, idx) => (
+                <div key={idx} style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px', 
+                  marginBottom: idx < conflicts.length - 1 ? '10px' : 0, 
+                  paddingBottom: idx < conflicts.length - 1 ? '10px' : 0, 
+                  borderBottom: idx < conflicts.length - 1 ? '1px solid #e2e8f0' : 'none' 
+                }}>
+                  <span style={{ fontWeight: '600', color: '#0f172a', whiteSpace: 'nowrap' }}>Mã: {c.booking_code}</span>
+                  <span style={{ color: '#cbd5e1' }}>|</span>
+                  <span style={{ fontSize: '13px', color: '#475569', whiteSpace: 'nowrap' }}>Khách: {c.guest_name}</span>
+                  <span style={{ color: '#cbd5e1' }}>|</span>
+                  <span style={{ fontSize: '13px', color: '#475569' }}>
+                    Thời gian: {new Date(c.expected_checkin).toLocaleString('vi-VN')} - {new Date(c.expected_checkout).toLocaleString('vi-VN')}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="cb-modal-actions" style={{ justifyContent: 'center' }}>
+              <button 
+                className="cb-btn cb-btn--cancel" 
+                onClick={() => setShowConflictModal(false)}
+                style={{ width: '100%' }}
+              >
+                Đóng & Chọn lại thời gian
+              </button>
+            </div>
           </div>
         </div>
       )}

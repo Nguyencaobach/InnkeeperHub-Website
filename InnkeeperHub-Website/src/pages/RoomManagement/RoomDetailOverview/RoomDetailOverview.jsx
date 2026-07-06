@@ -26,7 +26,9 @@ function RoomActivityList() {
   );
 
   const displayRooms = sortedRooms.filter(room => {
-    const matchStatus = filterStatus === 'ALL' || room.status === filterStatus;
+    // Phòng RESERVED hiển thị như AVAILABLE (khách đặt trước nhưng chưa đến)
+    const effectiveStatus = room.status === 'RESERVED' ? 'AVAILABLE' : room.status;
+    const matchStatus = filterStatus === 'ALL' || effectiveStatus === filterStatus;
     const matchSearch = room.room_number.toLowerCase().includes(searchTerm.toLowerCase().trim());
     return matchStatus && matchSearch;
   });
@@ -46,12 +48,15 @@ function RoomActivityList() {
   };
 
   const handleViewSchedule = (room) => {
-    alert(`Đang mở Lịch đặt trước của phòng ${room.room_number}... (Chức năng đang phát triển)`);
+    navigate(`/rooms/activities/list/${roomTypeId}/reserved-bookings`, {
+      state: { room, roomTypeName, roomType: roomTypeData }
+    });
   };
 
   const renderStatus = (status) => {
     switch (status) {
       case 'AVAILABLE': return <span className="status-badge status-available">Trống</span>;
+      case 'RESERVED': return <span className="status-badge status-available">Trống</span>; // Khách đặt trước nhưng chưa đến — phòng vẫn trống thực tế
       case 'OCCUPIED': return <span className="status-badge status-occupied">Đang ở</span>;
       case 'CLEANING': return <span className="status-badge status-cleaning">Đang dọn dẹp</span>;
       case 'MAINTENANCE': return <span className="status-badge status-maintenance">Bảo trì</span>;
@@ -118,8 +123,8 @@ function RoomActivityList() {
                     Lịch đặt trước
                   </button>
 
-                  {/* Nút Tạo phiên thuê — chỉ hiện khi phòng Trống */}
-                  {room.status === 'AVAILABLE' && (
+                  {/* Nút Tạo phiên thuê — hiện khi AVAILABLE hoặc RESERVED */}
+                  {(room.status === 'AVAILABLE' || room.status === 'RESERVED') && (
                     <button
                       className="btn-action-booking primary"
                       onClick={() => handleCreateSession(room)}

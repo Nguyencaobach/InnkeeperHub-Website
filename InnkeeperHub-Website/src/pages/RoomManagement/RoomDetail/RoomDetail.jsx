@@ -188,8 +188,8 @@ function RoomDetail() {
             <option value="MAINTENANCE">Bảo trì (Maintenance)</option>
           </select>
 
-          <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm phòng mới
+          <button className="btn-add-green" style={{ fontWeight: 'bold' }} onClick={handleAddNew}>
+            Thêm phòng mới
           </button>
         </div>
       </div>
@@ -218,11 +218,11 @@ function RoomDetail() {
                     onClick={() => handleEdit(room)}
                     disabled={room.status === 'OCCUPIED'}
                     title={room.status === 'OCCUPIED' ? 'Không thể chỉnh sửa khi phòng đang có khách' : ''}
-                    style={room.status === 'OCCUPIED' ? { opacity: 0.45, cursor: 'not-allowed' } : {}}
+                    style={room.status === 'OCCUPIED' ? { opacity: 0.45, cursor: 'not-allowed', fontWeight: 'bold' } : { fontWeight: 'bold' }}
                   >
                     Chỉnh sửa
                   </button>
-                  <button className="btn-action-text delete" onClick={() => handleDeleteClick(room.id)}>
+                  <button className="btn-action-text delete" style={{ fontWeight: 'bold' }} onClick={() => handleDeleteClick(room.id)}>
                     Xóa
                   </button>
                 </div>
@@ -299,8 +299,7 @@ function RoomDetail() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-icon">
-              <i className="ph ph-trash"></i>
-            </div>
+              </div>
             <h3>Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa phòng này không?</p>
             <div className="modal-actions">

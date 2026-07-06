@@ -3,6 +3,7 @@
  * Mở cửa sổ in mới với nội dung hóa đơn đầy đủ.
  * Cách này KHÔNG phụ thuộc vào @media print CSS tricks nên luôn hoạt động đúng.
  */
+import { getImageSrc } from '../../../utils/imageUrl';
 
 const fmt = (n) =>
   n != null ? Number(n).toLocaleString('vi-VN') + ' đ' : '—';
@@ -79,6 +80,20 @@ export function printInvoice({
   const logoHtml = businessInfo?.logo_url
     ? `<img src="${businessInfo.logo_url}" class="logo" alt="Logo" />`
     : '';
+
+  // ── CCCD ──────────────────────────────────────────────────────
+  const cccdFrontUrl = booking?.cccd_front_url ? getImageSrc(booking.cccd_front_url) : null;
+  const cccdBackUrl = booking?.cccd_back_url ? getImageSrc(booking.cccd_back_url) : null;
+
+  const cccdHtml = (cccdFrontUrl || cccdBackUrl) ? `
+    <div style="page-break-inside: avoid; margin-top: 24px; padding-top: 10px; border-top: 1px dashed #ccc;">
+      <div class="section-title">Anh CCCD Khach hang</div>
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+        ${cccdFrontUrl ? `<img src="${cccdFrontUrl}" alt="CCCD Mat Truoc" style="width: 48%; max-height: 250px; object-fit: contain; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; padding: 4px;" />` : ''}
+        ${cccdBackUrl ? `<img src="${cccdBackUrl}" alt="CCCD Mat Sau" style="width: 48%; max-height: 250px; object-fit: contain; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; padding: 4px;" />` : ''}
+      </div>
+    </div>
+  ` : '';
 
   const html = `<!DOCTYPE html>
 <html lang="vi">
@@ -520,6 +535,8 @@ export function printInvoice({
       </div>
     </div>
   </div>
+
+  ${cccdHtml}
 
   <!-- CHỮ KÝ -->
   <div class="sign-row">

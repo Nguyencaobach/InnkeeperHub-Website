@@ -12,6 +12,9 @@ const customerApi = {
 
   // Khóa tài khoản khách hàng (Xóa mềm)
   delete: (id) => axiosClient.delete(`/api/customers/${id}`),
+
+  // Xóa vĩnh viễn khách hàng (Xóa cứng)
+  hardDelete: (id) => axiosClient.delete(`/api/customers/hard/${id}`),
 };
 
 export default customerApi;

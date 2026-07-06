@@ -173,7 +173,7 @@ function Discount() {
       <div className="ds-header">
         <h2>Quản lý Mã giảm giá</h2>
         <button className="btn-add-green" onClick={handleAddNew} disabled={isEditing && !selectedDiscount}>
-          <i className="ph-bold ph-plus"></i> Tạo mã mới
+          Tạo mã mới
         </button>
       </div>
 
@@ -222,10 +222,10 @@ function Discount() {
                   {!isEditing ? (
                     <>
                       <button className="btn-warning" onClick={() => setIsEditing(true)}>
-                        <i className="ph ph-pencil"></i> Chỉnh sửa
+                        Chỉnh sửa
                       </button>
                       <button className="btn-danger" onClick={() => setShowDeleteModal(true)}>
-                        <i className="ph ph-trash"></i> Xóa
+                        Xóa
                       </button>
                     </>
                   ) : (
@@ -356,8 +356,7 @@ function Discount() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-icon">
-              <i className="ph ph-trash"></i>
-            </div>
+              </div>
             <h3>Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa mã <b>{selectedDiscount?.code}</b>? Hành động này không thể hoàn tác.</p>
             <div className="modal-actions">

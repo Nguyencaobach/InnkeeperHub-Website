@@ -17,3 +17,31 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Global Delete Buttons override */
+.btn-danger,
+.btn-action-text.delete,
+.btn-action.btn-delete,
+.ril-delete-range-btn {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: bold !important;
+  box-shadow: none !important;
+}
+
+/* Global Add and Edit Buttons Bold override */
+.btn-add-green,
+.btn-primary,
+.btn-warning,
+.btn-action-text.edit,
+.btn-action.btn-edit {
+  font-weight: bold !important;
+}
+
+.btn-danger:hover,
+.btn-action-text.delete:hover,
+.btn-action.btn-delete:hover,
+.ril-delete-range-btn:hover {
+  background-color: #dc2626 !important;
+}

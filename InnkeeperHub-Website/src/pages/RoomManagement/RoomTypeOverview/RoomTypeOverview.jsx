@@ -149,16 +149,13 @@ function RoomActivityOverview() {
             <i className="ph-bold ph-arrow-left"></i>
           </button>
           <h3 className="detail-title">{selectedRoom.name}</h3>
-          <span className="badge-capacity">
-            <i className="ph-fill ph-users"></i> Sức chứa: {selectedRoom.capacity} người
-          </span>
         </div>
 
         <button
           className="btn-view-rooms"
           onClick={() => navigate(`/rooms/activities/list/${selectedRoom.id}`, { state: { roomTypeName: selectedRoom.name } })}
         >
-          <i className="ph-bold ph-list-dashes"></i> Xem danh sách phòng
+          Xem danh sách phòng
         </button>
       </div>
 
@@ -184,6 +181,10 @@ function RoomActivityOverview() {
           <div className="info-box">
             <span className="info-label">Vị trí (Tầng)</span>
             <span className="info-value">{selectedRoom.floor || '—'}</span>
+          </div>
+          <div className="info-box">
+            <span className="info-label">Sức chứa</span>
+            <span className="info-value">{selectedRoom.capacity} người</span>
           </div>
         </div>
 

@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useCustomersQuery, useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from '../../hooks/useCustomers';
+import { useCustomersQuery, useCreateCustomer, useUpdateCustomer, useDeleteCustomer, useHardDeleteCustomer } from '../../hooks/useCustomers';
 import './CustomerManagement.css';
 
 function CustomerManagement() {
   // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchCustomers =====
-  const { data: customerList = [], isLoading: isLoadingCustomers } = useCustomersQuery();
+  const { data: customerList = [] } = useCustomersQuery();
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
   const deleteCustomerMutation = useDeleteCustomer();
+  const hardDeleteCustomerMutation = useHardDeleteCustomer();
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +28,7 @@ function CustomerManagement() {
 
   // isSaving/isDeleting lấy từ mutation state
   const isSaving = createCustomerMutation.isPending || updateCustomerMutation.isPending;
-  const isDeleting = deleteCustomerMutation.isPending;
+  const isDeleting = deleteCustomerMutation.isPending || hardDeleteCustomerMutation.isPending;
 
 
   // Xử lý Lọc, Tìm kiếm và SẮP XẾP BẢNG CHỮ CÁI
@@ -175,6 +176,19 @@ function CustomerManagement() {
     }
   };
 
+  const confirmHardDelete = async () => {
+    if (isDeleting) return;
+    try {
+      await hardDeleteCustomerMutation.mutateAsync(selectedCustomer.customer_id);
+      setShowDeleteModal(false);
+      setSelectedCustomer(null);
+      setShowSuccessModal(true);
+    } catch (error) {
+      alert(error.response?.data?.message || "Lỗi khi xóa vĩnh viễn.");
+      setShowDeleteModal(false);
+    }
+  };
+
   // Helper render huy hiệu Trạng thái
   const renderStatusBadge = (isActive) => {
     if (isActive) return <span className="status-badge status-active">HOẠT ĐỘNG</span>;
@@ -211,7 +225,7 @@ function CustomerManagement() {
             <option value="ALL">Tất cả trạng thái</option>
           </select>
           <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm khách hàng
+            Thêm khách hàng
           </button>
         </div>
       </div>
@@ -266,7 +280,7 @@ function CustomerManagement() {
                     <>
                       <button className="btn-action-text edit" onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
                       {selectedCustomer.is_active && (
-                        <button className="btn-action-text delete" onClick={() => setShowDeleteModal(true)}>Khóa tài khoản</button>
+                        <button className="btn-action-text delete" onClick={() => setShowDeleteModal(true)}>Xóa</button>
                       )}
                     </>
                   ) : (
@@ -402,13 +416,16 @@ function CustomerManagement() {
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="modal-icon"><i className="ph ph-trash"></i></div>
-            <h3>Khóa tài khoản</h3>
-            <p>Khách hàng này sẽ không thể đăng nhập vào hệ thống được nữa. Xác nhận khóa?</p>
+            <div className="modal-icon"></div>
+            <h3>Thao tác tài khoản</h3>
+            <p>Chọn <strong>Khóa tài khoản</strong> để ngăn khách hàng đăng nhập, hoặc <strong>Xóa vĩnh viễn</strong> để xóa hoàn toàn dữ liệu (chỉ áp dụng nếu chưa có hóa đơn).</p>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowDeleteModal(false)}>Hủy</button>
-              <button className="btn-action-text delete" style={{ flex: 1, padding: '10px', justifyContent: 'center' }} onClick={confirmDelete} disabled={isDeleting}>
-                {isDeleting ? 'Đang xử lý...' : 'Khóa tài khoản'}
+              <button className="btn-warning" style={{ padding: '10px 15px' }} onClick={confirmDelete} disabled={isDeleting}>
+                Khóa TK
+              </button>
+              <button className="btn-action-text delete" style={{ padding: '10px 15px', background: '#fee2e2', color: '#dc2626' }} onClick={confirmHardDelete} disabled={isDeleting}>
+                {isDeleting ? 'Đang xóa...' : 'Xóa vĩnh viễn'}
               </button>
             </div>
           </div>

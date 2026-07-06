@@ -274,7 +274,7 @@ function ProductBatches() {
           </div>
 
           <button className="btn-add-batch" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm lô hàng
+            Thêm lô hàng
           </button>
         </div>
       </div>

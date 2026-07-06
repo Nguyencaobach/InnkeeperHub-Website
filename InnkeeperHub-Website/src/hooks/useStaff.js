@@ -51,3 +51,13 @@ export function useDeleteStaff() {
     },
   });
 }
+
+export function useHardDeleteStaff() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => staffApi.hardDelete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.STAFF });
+    },
+  });
+}

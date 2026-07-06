@@ -34,7 +34,7 @@ function RoomTypeSettings() {
   const queryClient = useQueryClient();
 
   // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchRoomTypes =====
-  const { data: roomTypes = [], isLoading: isLoadingRoomTypes } = useRoomTypesQuery();
+  const { data: roomTypes = [] } = useRoomTypesQuery();
   const createRoomTypeMutation = useCreateRoomType();
   const updateRoomTypeMutation = useUpdateRoomType();
   const deleteRoomTypeMutation = useDeleteRoomType();
@@ -71,7 +71,7 @@ function RoomTypeSettings() {
     } catch (error) {
       console.error("Lỗi giải mã tiện ích phòng:", error);
       if (typeof amenitiesStr === 'string') {
-        return amenitiesStr.replace(/[\[\]"]/g, '').split(',').map(s => s.trim()).filter(Boolean);
+        return amenitiesStr.replace(/[\]["]/g, '').split(',').map(s => s.trim()).filter(Boolean);
       }
       return [];
     }
@@ -350,12 +350,13 @@ function RoomTypeSettings() {
             <>
               <button
                 className="btn-primary"
+                style={{ fontWeight: 'bold' }}
                 onClick={() => navigate(`/rooms/details/${selectedRoom.id}`, { state: { roomTypeName: selectedRoom.name } })}
               >
-                <i className="ph ph-list-plus"></i> Thêm DS phòng
+                Thêm DS phòng
               </button>
-              <button className="btn-warning" onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
-              <button className="btn-danger" onClick={() => setShowDeleteModal(true)}>Xóa</button>
+              <button className="btn-warning" style={{ fontWeight: 'bold' }} onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
+              <button className="btn-danger" style={{ fontWeight: 'bold' }} onClick={() => setShowDeleteModal(true)}>Xóa</button>
             </>
           ) : (
             <>
@@ -483,8 +484,8 @@ function RoomTypeSettings() {
         <h2>Danh sách Loại phòng</h2>
         {/* Nút thêm mới chỉ hiển thị ở màn grid */}
         {!selectedRoom && !isEditing && (
-          <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm loại phòng mới
+          <button className="btn-add-green" style={{ fontWeight: 'bold' }} onClick={handleAddNew}>
+             Thêm loại phòng mới
           </button>
         )}
       </div>
@@ -543,8 +544,7 @@ function RoomTypeSettings() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-icon">
-              <i className="ph ph-trash"></i>
-            </div>
+              </div>
             <h3>Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa? Hành động này không thể hoàn tác.</p>
             <div className="modal-actions">

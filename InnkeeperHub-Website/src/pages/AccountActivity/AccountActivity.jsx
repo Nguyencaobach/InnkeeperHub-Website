@@ -327,8 +327,7 @@ function AccountActivity() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-icon" style={{ color: '#ef4444' }}>
-              <i className="ph ph-trash"></i>
-            </div>
+              </div>
             <h3>Xóa nhật ký cũ</h3>
             <p>
               Xóa toàn bộ log hoạt động <strong>từ ngày được chọn trở về trước</strong> (bao gồm cả ngày được chọn).

@@ -255,7 +255,7 @@ function ProductPickerModal({ bookingId, onAdded, onClose }) {
                           >
                             {isAdding
                               ? <i className="ph-bold ph-spinner ppm-spin" />
-                              : <><i className="ph-bold ph-plus" /> Thêm</>
+                              : <>Thêm</>
                             }
                           </button>
                         </div>

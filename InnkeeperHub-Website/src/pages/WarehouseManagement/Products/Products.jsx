@@ -389,7 +389,7 @@ function Products() {
           </button>
 
           <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm sản phẩm
+            Thêm sản phẩm
           </button>
         </div>
       </div>

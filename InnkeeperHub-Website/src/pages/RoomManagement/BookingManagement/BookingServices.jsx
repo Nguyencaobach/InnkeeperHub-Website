@@ -149,7 +149,6 @@ function BookingServices() {
               type="button"
               onClick={() => setShowProductPicker(true)}
             >
-              <i className="ph-bold ph-plus-circle" />
               <span>Chọn hàng hóa</span>
               <i className="ph-bold ph-caret-right bs-caret" />
             </button>
@@ -195,8 +194,7 @@ function BookingServices() {
                       disabled={updatingId === item.id || removingId === item.id}
                       title="Tăng"
                     >
-                      <i className="ph-bold ph-plus" />
-                    </button>
+                      </button>
                   </div>
                   <span className="bs-item-total">
                     {formatMoney(item.unit_price * item.quantity)}
@@ -244,7 +242,6 @@ function BookingServices() {
               type="button"
               onClick={() => setShowServicePicker(true)}
             >
-              <i className="ph-bold ph-plus-circle" />
               <span>Chọn dịch vụ</span>
               <i className="ph-bold ph-caret-right bs-caret" />
             </button>
@@ -285,8 +282,7 @@ function BookingServices() {
                       disabled={updatingId === item.id || removingId === item.id}
                       title="Tăng"
                     >
-                      <i className="ph-bold ph-plus" />
-                    </button>
+                      </button>
                   </div>
                   <span className="bs-item-total">
                     {formatMoney(item.unit_price * item.quantity)}

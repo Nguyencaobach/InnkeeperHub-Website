@@ -151,7 +151,7 @@ function ProductCategory() {
             />
           </div>
           <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm danh mục
+            Thêm danh mục
           </button>
         </div>
       </div>
@@ -289,7 +289,7 @@ function ProductCategory() {
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-content" style={{maxWidth: '380px'}}>
-            <div className="modal-icon" style={{fontSize: '54px'}}><i className="ph ph-trash"></i></div>
+            <div className="modal-icon" style={{fontSize: '54px'}}></div>
             <h3>Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa danh mục này? Không thể xóa nếu đang có sản phẩm thuộc danh mục này.</p>
             <div className="modal-actions">

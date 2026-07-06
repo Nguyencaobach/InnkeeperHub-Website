@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import bookingApi from '../../../api/bookingApi';
@@ -69,7 +69,6 @@ function PaymentOverview() {
   // Dịch vụ thêm
   const [inventoryItems, setInventoryItems] = useState([]);
   const [serviceItems, setServiceItems] = useState([]);
-  const [isLoadingServices, setIsLoadingServices] = useState(true);
 
   // Thanh toán
   const [paymentMethod, setPaymentMethod] = useState('CASH');
@@ -86,6 +85,7 @@ function PaymentOverview() {
   // ── POPULATE FORM TỪ BOOKING ──────────────────────────────────────────────
   useEffect(() => {
     if (!booking) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGuestName(booking.guest_name || '');
     setGuestPhone(booking.guest_phone || '');
     setGuestEmail(booking.guest_email || '');
@@ -116,6 +116,7 @@ function PaymentOverview() {
 
   // ── FETCH THÔNG TIN DOANH NGHIỆP + BANK CODE VIETQR ─────────────────
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoadingBiz(true);
     profileApi.getBusinessSettings()
       .then(async (res) => {
@@ -148,15 +149,14 @@ function PaymentOverview() {
 
   // ── LOAD DỊCH VỤ ─────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!booking?.booking_id) { setIsLoadingServices(false); return; }
+    if (!booking?.booking_id) { return; }
     bookingServiceItemApi.getByBookingId(booking.booking_id)
       .then((res) => {
         const all = Array.isArray(res) ? res : (res?.data ?? []);
         setInventoryItems(all.filter((i) => i.service_type === 'INVENTORY'));
         setServiceItems(all.filter((i) => i.service_type === 'GENERAL'));
       })
-      .catch(() => {})
-      .finally(() => setIsLoadingServices(false));
+      .catch(() => {});
   }, [booking?.booking_id]);
 
   // ── TÍNH TIỀN PHÒNG (đóng băng theo checkoutTime) ─────────────────────────
@@ -299,7 +299,6 @@ function PaymentOverview() {
           })}
           title="In hóa đơn"
         >
-          <i className="ph-bold ph-printer" />
           <span>In hóa đơn</span>
         </button>
       </div>
@@ -361,7 +360,7 @@ function PaymentOverview() {
                 <label className="cb-label">Ảnh CCCD (Mặt Trước)</label>
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_front_url ? 'has-image' : ''}`}
-                  style={booking?.cccd_front_url ? { backgroundImage: `url(${getImageSrc(booking.cccd_front_url)})` } : {}}
+                  style={booking?.cccd_front_url ? { backgroundImage: `url('${getImageSrc(booking.cccd_front_url)}')` } : {}}
                 >
                   {!booking?.cccd_front_url && (
                     <span className="cb-cccd-placeholder">
@@ -377,7 +376,7 @@ function PaymentOverview() {
                 <label className="cb-label">Ảnh CCCD (Mặt Sau)</label>
                 <div
                   className={`cb-cccd-preview ${booking?.cccd_back_url ? 'has-image' : ''}`}
-                  style={booking?.cccd_back_url ? { backgroundImage: `url(${getImageSrc(booking.cccd_back_url)})` } : {}}
+                  style={booking?.cccd_back_url ? { backgroundImage: `url('${getImageSrc(booking.cccd_back_url)}')` } : {}}
                 >
                   {!booking?.cccd_back_url && (
                     <span className="cb-cccd-placeholder">

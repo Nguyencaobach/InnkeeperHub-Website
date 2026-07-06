@@ -22,6 +22,7 @@ import RoomInvoiceLog from './pages/AccountActivity/RoomInvoiceLog';
 import WarehouseStatus from './pages/Dashboard/WarehouseStatus/WarehouseStatus';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import NgrokGate from './components/NgrokGate/NgrokGate';
+import ReserveBookingPage from './pages/RoomManagement/ReserveBooking/ReserveBookingPage';
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
             <Route path="rooms/activities/list/:id/view-booking" element={<ViewBooking />} />
             <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
             <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
+            <Route path="rooms/activities/list/:id/reserved-bookings" element={<ReserveBookingPage />} />
             <Route path="/staff-management/account" element={<StaffManagement />} />
             <Route path="/staff-management/timekeeping" element={<StaffManagement />} />
             <Route path="/customers" element={<CustomerManagement />} />

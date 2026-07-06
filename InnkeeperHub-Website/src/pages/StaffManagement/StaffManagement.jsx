@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useStaffQuery, useCreateStaff, useUpdateStaff, useDeleteStaff } from '../../hooks/useStaff';
+import { useStaffQuery, useCreateStaff, useUpdateStaff, useDeleteStaff, useHardDeleteStaff } from '../../hooks/useStaff';
 import './StaffManagement.css';
 
 function StaffManagement() {
   // ===== TANSTACK QUERY: Thay thế useState/useEffect + fetchStaff =====
-  const { data: staffList = [], isLoading: isLoadingStaff } = useStaffQuery();
+  const { data: staffList = [] } = useStaffQuery();
   const createStaffMutation = useCreateStaff();
   const updateStaffMutation = useUpdateStaff();
   const deleteStaffMutation = useDeleteStaff();
+  const hardDeleteStaffMutation = useHardDeleteStaff();
 
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -28,7 +29,7 @@ function StaffManagement() {
 
   // isSaving/isDeleting lấy trực tiếp từ mutation state
   const isSaving = createStaffMutation.isPending || updateStaffMutation.isPending;
-  const isDeleting = deleteStaffMutation.isPending;
+  const isDeleting = deleteStaffMutation.isPending || hardDeleteStaffMutation.isPending;
 
   // Lấy thông tin người đang đăng nhập từ LocalStorage để kiểm tra quyền
   const currentUser = JSON.parse(localStorage.getItem('user')) || {};
@@ -214,6 +215,19 @@ function StaffManagement() {
     }
   };
 
+  const confirmHardDelete = async () => {
+    if (isDeleting) return;
+    try {
+      await hardDeleteStaffMutation.mutateAsync(selectedStaff.user_id);
+      setShowDeleteModal(false);
+      setSelectedStaff(null);
+      setShowSuccessModal(true);
+    } catch (error) {
+      alert(error.response?.data?.message || "Lỗi khi xóa vĩnh viễn.");
+      setShowDeleteModal(false);
+    }
+  };
+
   // Helper render huy hiệu Role
   const renderRoleBadge = (role) => {
     if (role === 'ADMIN') return <span className="role-badge role-admin">ADMIN</span>;
@@ -267,7 +281,7 @@ function StaffManagement() {
             <option value="STAFF">Nhân viên (Staff)</option>
           </select>
           <button className="btn-add-green" onClick={handleAddNew}>
-            <i className="ph-bold ph-plus"></i> Thêm nhân viên
+            Thêm nhân viên
           </button>
         </div>
       </div>
@@ -288,12 +302,14 @@ function StaffManagement() {
                   className={`staff-item ${selectedStaff?.user_id === staff.user_id ? 'active' : ''} ${!staff.is_active ? 'inactive' : ''}`}
                   onClick={() => { if (!isEditing) handleSelectStaff(staff); }}
                 >
-                  <div className="staff-name">
-                    <span>
+                  <div className="staff-name" style={{ width: '100%' }}>
+                    <span className="staff-fullname" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {staff.full_name}
                     </span>
-                    {renderStatusBadge(staff.is_active)}
-                    {renderRoleBadge(staff.role)}
+                    <div className="staff-badges" style={{ display: 'flex', gap: '6px', flexShrink: 0, marginLeft: 'auto' }}>
+                      {renderStatusBadge(staff.is_active)}
+                      {renderRoleBadge(staff.role)}
+                    </div>
                   </div>
                   <div className="staff-email">
                     <i className="ph-fill ph-envelope-simple"></i> {staff.email}
@@ -324,7 +340,7 @@ function StaffManagement() {
                     <>
                       <button className="btn-action-text edit" onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
                       {canEditStatus && selectedStaff?.is_active && (
-                        <button className="btn-action-text delete" onClick={() => setShowDeleteModal(true)}>Khóa tài khoản</button>
+                        <button className="btn-action-text delete" onClick={() => setShowDeleteModal(true)}>Xóa</button>
                       )}
                     </>
                   ) : (
@@ -511,13 +527,16 @@ function StaffManagement() {
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="modal-icon"><i className="ph ph-trash"></i></div>
-            <h3>Khóa tài khoản</h3>
-            <p>Người này sẽ không thể đăng nhập vào hệ thống được nữa. Xác nhận khóa?</p>
+            <div className="modal-icon"></div>
+            <h3>Thao tác tài khoản</h3>
+            <p>Chọn <strong>Khóa tài khoản</strong> để ngăn nhân viên đăng nhập, hoặc <strong>Xóa vĩnh viễn</strong> để xóa hoàn toàn dữ liệu (chỉ áp dụng nếu chưa có giao dịch).</p>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowDeleteModal(false)}>Hủy</button>
-              <button className="btn-action-text delete" style={{ flex: 1, padding: '10px', justifyContent: 'center' }} onClick={confirmDelete} disabled={isDeleting}>
-                {isDeleting ? 'Đang xử lý...' : 'Khóa tài khoản'}
+              <button className="btn-warning" style={{ padding: '10px 15px' }} onClick={confirmDelete} disabled={isDeleting}>
+                Khóa TK
+              </button>
+              <button className="btn-action-text delete" style={{ padding: '10px 15px', background: '#fee2e2', color: '#dc2626' }} onClick={confirmHardDelete} disabled={isDeleting}>
+                {isDeleting ? 'Đang xóa...' : 'Xóa vĩnh viễn'}
               </button>
             </div>
           </div>

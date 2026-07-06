@@ -12,6 +12,9 @@ const staffApi = {
 
   // Khóa tài khoản nhân viên (Xóa mềm)
   delete: (id) => axiosClient.delete(`/api/staff/${id}`),
+
+  // Xóa vĩnh viễn nhân viên (Xóa cứng)
+  hardDelete: (id) => axiosClient.delete(`/api/staff/hard/${id}`),
 };
 
 export default staffApi;

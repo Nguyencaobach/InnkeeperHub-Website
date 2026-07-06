@@ -210,7 +210,6 @@ function PersonalProfileTab({ user, setUser }) {
       <div className="tab-action-bar">
         {!isEditing ? (
           <button className="btn-action-text edit" onClick={() => setIsEditing(true)} disabled={isLoading}>
-            <i className="ph ph-pencil-simple"></i>
             {isLoading ? 'Đang tải...' : 'Chỉnh sửa'}
           </button>
         ) : (
@@ -502,7 +501,6 @@ function BusinessSettingsTab() {
       <div className="tab-action-bar">
         {!isEditing ? (
           <button className="btn-action-text edit" onClick={() => setIsEditing(true)} disabled={isLoading}>
-            <i className="ph ph-pencil-simple"></i>
             {isLoading ? 'Đang tải...' : (hasData ? 'Chỉnh sửa' : 'Thiết lập ngay')}
           </button>
         ) : (

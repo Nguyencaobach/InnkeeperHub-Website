@@ -51,3 +51,13 @@ export function useDeleteCustomer() {
     },
   });
 }
+
+export function useHardDeleteCustomer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => customerApi.hardDelete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOMERS });
+    },
+  });
+}

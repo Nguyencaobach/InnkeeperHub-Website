@@ -184,7 +184,7 @@ function AdditionalServices() {
       <div className="as-header">
         <h2>Quản lý Dịch vụ đi kèm</h2>
         <button className="btn-add-green" onClick={handleAddNew}>
-          <i className="ph-bold ph-plus"></i> Thêm dịch vụ
+          Thêm dịch vụ
         </button>
       </div>
 
