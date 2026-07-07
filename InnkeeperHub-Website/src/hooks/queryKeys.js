@@ -43,4 +43,7 @@ export const QUERY_KEYS = {
 
   // ── Profile ──
   PROFILE: ['profile'],
+
+  // ── Customer Service Orders ──
+  CUSTOMER_SERVICE_ORDERS: ['customerServiceOrders'],
 };

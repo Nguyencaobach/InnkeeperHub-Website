@@ -136,6 +136,7 @@ function MainLayout() {
                   <NavLink to="/rooms/settings" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt phòng</NavLink>
                 )}
                 <NavLink to="/rooms/activities" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động phòng</NavLink>
+                <NavLink to="/rooms/activities/customer-orders" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Hoạt động khách hàng</NavLink>
               </div>
             </div>
           )}

@@ -106,7 +106,7 @@ function ReserveBookingModal({ reservation, roomTypeId, room, roomTypeName, onCl
 
     try {
       setSaving(true);
-      const res = await reserveBookingApi.updateReservedBooking(reservation.booking_id, {
+      const res = await reserveBookingApi.updateTime(reservation.booking_id, {
         expected_checkin: newCheckin,
         expected_checkout: newCheckout,
       });
@@ -122,7 +122,7 @@ function ReserveBookingModal({ reservation, roomTypeId, room, roomTypeName, onCl
   const handleDelete = async () => {
     try {
       setDeleting(true);
-      await reserveBookingApi.deleteReservedBooking(reservation.booking_id);
+      await reserveBookingApi.deleteReservation(reservation.booking_id);
       onDeleted(reservation.booking_id);
       onClose();
     } catch (err) {
@@ -135,9 +135,10 @@ function ReserveBookingModal({ reservation, roomTypeId, room, roomTypeName, onCl
   const handleConvert = async () => {
     try {
       setConverting(true);
-      const res = await reserveBookingApi.convertReservedToActive(reservation.booking_id);
-      // Invalidate query to refresh the activities list
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOMS_ACTIVITIES(roomTypeId) });
+      const res = await reserveBookingApi.convertToRented(reservation.booking_id);
+      // Invalidate queries to refresh the rooms list and booking list
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOOKING_BY_ROOM(room?.id) });
       
       // Navigate to PaymentOverview for the new active booking
       navigate(`/rooms/activities/booking/${res.data.booking_id}`, {

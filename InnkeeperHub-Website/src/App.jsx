@@ -24,6 +24,7 @@ import WarehouseStatus from './pages/Dashboard/WarehouseStatus/WarehouseStatus';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import NgrokGate from './components/NgrokGate/NgrokGate';
 import ReserveBookingPage from './pages/RoomManagement/ReserveBooking/ReserveBookingPage';
+import CustomerActivityPage from './pages/RoomManagement/CustomerActivity/CustomerActivityPage';
 
 function App() {
   const userData = localStorage.getItem('user');
@@ -54,6 +55,7 @@ function App() {
               <Route path="rooms/activities/list/:id/booking-services" element={<BookingServices />} />
               <Route path="rooms/activities/list/:id/payment-overview" element={<PaymentOverview />} />
               <Route path="rooms/activities/list/:id/reserved-bookings" element={<ReserveBookingPage />} />
+              <Route path="rooms/activities/customer-orders" element={<CustomerActivityPage />} />
               <Route path="/customers" element={<CustomerManagement />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
