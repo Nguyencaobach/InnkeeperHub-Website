@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import bookingApi from '../../../api/bookingApi';
+import voucherApi from '../../../api/voucherApi';
 import bookingServiceItemApi from '../../../api/bookingServiceItemApi';
 import roomTypeApi from '../../../api/roomTypeApi';
 import profileApi from '../../../api/profileApi';
@@ -12,6 +13,7 @@ import './CreateBooking.css';
 import './ViewBooking.css';
 import './BookingServices.css';
 import './PaymentOverview.css';
+import { BrowserMultiFormatReader } from '@zxing/browser';
 
 // ── Helpers (giống ViewBooking) ──────────────────────────────────────────────
 const formatMoney = (amount) =>
@@ -76,6 +78,19 @@ function PaymentOverview() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+
+  // Voucher & Tích điểm
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountInfo, setDiscountInfo] = useState(null); // { code, discount_amount, ... }
+  const [discountError, setDiscountError] = useState('');
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
+  const [memberInfo, setMemberInfo] = useState(null); // { customer_id, full_name, member_code, current_points }
+  const [memberError, setMemberError] = useState('');
+  const [memberCode, setMemberCode] = useState('');
+  const [isLookingMember, setIsLookingMember] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
   // Thông tin doanh nghiệp + VietQR
   const [businessInfo, setBusinessInfo] = useState(null);
@@ -180,9 +195,128 @@ function PaymentOverview() {
   const totalInventory = inventoryItems.reduce((s, i) => s + i.unit_price * i.quantity, 0);
   const totalService = serviceItems.reduce((s, i) => s + i.unit_price * i.quantity, 0);
   const serviceTotal = totalInventory + totalService;
-  const grandTotal = (roomTotal ?? 0) + serviceTotal;
+  const subtotal = (roomTotal ?? 0) + serviceTotal;
+  const discountAmount = discountInfo ? Number(discountInfo.discount_amount) : 0;
+  const depositAmount = booking?.deposit_amount ? Number(booking.deposit_amount) : 0;
+  const grandTotal = Math.max(0, subtotal - discountAmount - depositAmount);
+
+  // Điểm sẽ tích = grandTotal / 10.000
+  const pointsToEarn = Math.floor(grandTotal / 10000);
 
   const currentPrice = isHourly ? roomType?.hourly_price : roomType?.daily_price;
+
+  // ── ÁP DỤNG MÃ GIẢM GIÁ ──────────────────────────────────────────────────
+  const handleApplyDiscount = async () => {
+    if (!discountCode.trim()) return;
+    setIsApplyingDiscount(true);
+    setDiscountError('');
+    setDiscountInfo(null);
+    try {
+      const res = await voucherApi.applyDiscount(discountCode.trim());
+      const data = res?.data ?? res;
+      // Kiểm tra đơn tối thiểu
+      const minOrder = Number(data.min_order_value) || 0;
+      if (minOrder > 0 && subtotal < minOrder) {
+        setDiscountError(`Mã voucher yêu cầu đơn tối thiểu ${Number(minOrder).toLocaleString('vi-VN')}đ. Đơn hiện tại: ${Number(subtotal).toLocaleString('vi-VN')}đ`);
+        return;
+      }
+      setDiscountInfo(data);
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || 'Mã không hợp lệ';
+      setDiscountError(msg);
+    } finally {
+      setIsApplyingDiscount(false);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setDiscountCode('');
+    setDiscountInfo(null);
+    setDiscountError('');
+  };
+
+  // ── QUÉT MÃ THÀNH VIÊN ────────────────────────────────────────────────────
+  const handleLookupMember = async () => {
+    if (!memberCode.trim()) return;
+    setIsLookingMember(true);
+    setMemberError('');
+    setMemberInfo(null);
+    try {
+      const res = await voucherApi.lookupMember(memberCode.trim());
+      const data = res?.data ?? res;
+      setMemberInfo(data);
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || 'Không tìm thấy khách hàng';
+      setMemberError(msg);
+    } finally {
+      setIsLookingMember(false);
+    }
+  };
+
+  const handleRemoveMember = () => {
+    setMemberCode('');
+    setMemberInfo(null);
+    setMemberError('');
+  };
+
+  // ── CAMERA QUÉT BARCODE ──────────────────────────────────────────────────
+  const controlsRef = useRef(null);
+
+  const stopCamera = useCallback(() => {
+    if (controlsRef.current) {
+      controlsRef.current.stop();
+      controlsRef.current = null;
+    }
+    setShowCamera(false);
+  }, []);
+
+  useEffect(() => {
+    if (showCamera) {
+      const startScanner = async () => {
+        try {
+          const codeReader = new BrowserMultiFormatReader();
+          const controls = await codeReader.decodeFromConstraints(
+            { video: { facingMode: 'environment' } },
+            videoRef.current,
+            (result, error, currentControls) => {
+              if (result) {
+                const code = result.getText();
+                setMemberCode(code.toUpperCase());
+                
+                // Dừng camera an toàn qua controls
+                if (currentControls) {
+                  currentControls.stop();
+                } else if (controlsRef.current) {
+                  controlsRef.current.stop();
+                }
+                controlsRef.current = null;
+                setShowCamera(false);
+
+                // Auto lookup
+                setIsLookingMember(true);
+                setMemberError('');
+                setMemberInfo(null);
+                voucherApi.lookupMember(code.trim()).then(res => {
+                  setMemberInfo(res?.data ?? res);
+                }).catch(err => {
+                  setMemberError(err?.response?.data?.message || 'Không tìm thấy khách hàng');
+                }).finally(() => setIsLookingMember(false));
+              }
+            }
+          );
+          controlsRef.current = controls;
+        } catch (err) {
+          setMemberError('Không thể truy cập camera. Vui lòng nhập mã trực tiếp.');
+          setShowCamera(false);
+        }
+      };
+      setTimeout(startScanner, 100); // Đợi modal render video tag xong
+    }
+  }, [showCamera]);
+
+  const startCamera = () => {
+    setShowCamera(true);
+  };
 
   // ── XÁC NHẬN THANH TOÁN ──────────────────────────────────────────────────
   const handleConfirmCheckout = async () => {
@@ -211,13 +345,16 @@ function PaymentOverview() {
         payment_method: paymentMethod === 'TRANSFER' ? 'BANK_TRANSFER' : 'CASH',
         room_price:     roomTotal ?? 0,
         service_price:  serviceTotal,
+        discount_amount: discountAmount,
+        discount_code:  discountInfo?.code || null,
         final_amount:   grandTotal,
         services_detail: servicesDetail,
+        memberCode:     memberInfo?.member_code || null,
+        pointsToEarn:   pointsToEarn > 0 ? pointsToEarn : 0,
       };
 
       await bookingApi.checkout(booking.booking_id, paymentPayload);
 
-      // THAY THẾ ĐOẠN SET CACHE CŨ BẰNG ĐOẠN NÀY
       queryClient.setQueryData(QUERY_KEYS.ROOM_DETAILS(roomTypeId), (oldData) => {
         if (!oldData) return oldData;
         if (Array.isArray(oldData)) {
@@ -232,7 +369,6 @@ function PaymentOverview() {
         return oldData;
       });
 
-      // Invalidate cache để RoomDetailOverview hiển đúng trạng thái sau checkout
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROOM_DETAILS_ALL });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOOKINGS });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BILL_PAYMENTS_LOG });
@@ -294,6 +430,9 @@ function PaymentOverview() {
             serviceTotal,
             grandTotal,
             paymentMethod,
+            discountCode: discountInfo?.code || null,
+            discountAmount,
+            depositAmount,
             hoursReal,
             minutesReal,
           })}
@@ -590,6 +729,88 @@ function PaymentOverview() {
             <div className="po-checkout-time-value">{formatDateTime(checkoutTime)}</div>
           </div>
 
+          {/* ── ƯU ĐÃI & TÍCH ĐIỂM ──────────────────────────────────── */}
+          <div className="po-voucher-section">
+            <h4 className="po-voucher-title"><i className="ph-bold ph-ticket" /> Ưu đãi & Tích điểm</h4>
+
+            {/* Nhập mã giảm giá */}
+            <div className="po-voucher-row">
+              <label className="po-voucher-label">Mã giảm giá</label>
+              {discountInfo ? (
+                <div className="po-voucher-applied">
+                  <span className="po-voucher-applied-code">
+                    <i className="ph-bold ph-check-circle" style={{ color: '#16a34a' }} />
+                    {discountInfo.code} — Giảm {formatMoney(discountInfo.discount_amount)}
+                  </span>
+                  <button type="button" className="po-voucher-remove" onClick={handleRemoveDiscount}>
+                    <i className="ph-bold ph-x" />
+                  </button>
+                </div>
+              ) : (
+                <div className="po-voucher-input-wrap">
+                  <input
+                    type="text"
+                    className={`po-voucher-input ${discountError ? 'po-voucher-input--error' : ''}`}
+                    placeholder="Nhập mã giảm giá..."
+                    value={discountCode}
+                    onChange={(e) => { setDiscountCode(e.target.value.toUpperCase()); setDiscountError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyDiscount()}
+                  />
+                  <button
+                    type="button"
+                    className="po-voucher-apply-btn"
+                    onClick={handleApplyDiscount}
+                    disabled={isApplyingDiscount || !discountCode.trim()}
+                  >
+                    {isApplyingDiscount ? '...' : 'Áp dụng'}
+                  </button>
+                </div>
+              )}
+              {discountError && <span className="po-voucher-error">{discountError}</span>}
+            </div>
+
+            {/* Mã thành viên (tích điểm) */}
+            <div className="po-voucher-row" style={{ marginTop: '12px' }}>
+              <label className="po-voucher-label">Mã thành viên khách hàng</label>
+              {memberInfo ? (
+                <div className="po-member-info-card">
+                  <div className="po-member-info-left">
+                    <span style={{ color: '#16a34a', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                      <i className="ph-bold ph-check-circle" /> Mã hợp lệ
+                    </span>
+                    <span className="po-member-name"><i className="ph-bold ph-user" /> {memberInfo.full_name}</span>
+                    <span className="po-member-code">{memberInfo.member_code}</span>
+                    <span className="po-member-points">Điểm hiện có: <strong>{Number(memberInfo.current_points || 0).toLocaleString('vi-VN')}</strong></span>
+                    <span className="po-member-earn">Sẽ tích được: <strong style={{ color: '#16a34a' }}>+{pointsToEarn} điểm</strong></span>
+                  </div>
+                  <button type="button" className="po-voucher-remove" onClick={handleRemoveMember}>
+                    <i className="ph-bold ph-x" />
+                  </button>
+                </div>
+              ) : (
+                <div className="po-voucher-input-wrap">
+                  <input
+                    type="text"
+                    className={`po-voucher-input ${memberError ? 'po-voucher-input--error' : ''}`}
+                    placeholder="Nhập hoặc quét mã thành viên..."
+                    value={memberCode}
+                    onChange={(e) => { setMemberCode(e.target.value.toUpperCase()); setMemberError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLookupMember()}
+                  />
+                  <button
+                    type="button"
+                    className="po-voucher-apply-btn po-voucher-apply-btn--cam"
+                    onClick={startCamera}
+                    title="Quét barcode bằng camera"
+                  >
+                    <i className="ph-bold ph-camera" />
+                  </button>
+                </div>
+              )}
+              {memberError && <span className="po-voucher-error">{memberError}</span>}
+            </div>
+          </div>
+
           {/* 2. Tổng tiền phải trả */}
           <div className="po-money-block">
             <div className="po-money-row">
@@ -597,9 +818,25 @@ function PaymentOverview() {
               <span className="po-money-value">{formatMoney(roomTotal)}</span>
             </div>
             <div className="po-money-row">
-              <span className="po-money-label">Tiền dịch vụ &amp; sản phẩm</span>
+              <span className="po-money-label">Tiền dịch vụ & sản phẩm</span>
               <span className="po-money-value">{formatMoney(serviceTotal)}</span>
             </div>
+            {discountAmount > 0 && (
+              <div className="po-money-row po-money-row--discount">
+                <span className="po-money-label" style={{ color: '#16a34a' }}>
+                  <i className="ph-bold ph-tag" /> Giảm giá ({discountInfo?.code})
+                </span>
+                <span className="po-money-value" style={{ color: '#16a34a' }}>-{formatMoney(discountAmount)}</span>
+              </div>
+            )}
+            {depositAmount > 0 && (
+              <div className="po-money-row po-money-row--discount">
+                <span className="po-money-label" style={{ color: '#eab308' }}>
+                  <i className="ph-bold ph-piggy-bank" /> Tiền cọc đã trừ
+                </span>
+                <span className="po-money-value" style={{ color: '#eab308' }}>-{formatMoney(depositAmount)}</span>
+              </div>
+            )}
             <div className="po-total-row">
               <span className="po-total-label">Tổng cộng phải trả</span>
               <span className="po-total-value">{formatMoney(grandTotal)}</span>
@@ -787,8 +1024,49 @@ function PaymentOverview() {
         </div>
       )}
 
+      {/* ── MODAL CAMERA QUÉT BARCODE ──────────────────────────────── */}
+      {showCamera && (
+        <div className="po-qr-modal-overlay" onClick={stopCamera}>
+          <div className="po-qr-modal" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '400px' }}>
+            <div className="po-qr-modal-header">
+              <div className="po-qr-modal-title-wrap">
+                <div>
+                  <h3 className="po-qr-modal-title">Quét mã thành viên</h3>
+                  <p className="po-qr-modal-sub">Đưa mã barcode vào vùng camera</p>
+                </div>
+              </div>
+              <button className="po-qr-modal-close" onClick={stopCamera}>
+                <i className="ph-bold ph-x" />
+              </button>
+            </div>
+            
+            <div className="po-qr-modal-body" style={{ padding: '20px' }}>
+              <div style={{ position: 'relative', width: '100%', borderRadius: '12px', overflow: 'hidden', background: '#000', aspectRatio: '4/3' }}>
+                <video
+                  ref={videoRef}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  playsInline
+                />
+                {/* Khung ngắm barcode */}
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '80%', height: '40%',
+                  border: '2px dashed rgba(255, 255, 255, 0.7)',
+                  borderRadius: '8px',
+                  boxShadow: '0 0 0 4000px rgba(0, 0, 0, 0.4)'
+                }} />
+              </div>
+            </div>
 
-
+            <div className="po-qr-modal-footer">
+              <button className="po-qr-modal-done-btn" onClick={stopCamera} style={{ background: '#f1f5f9', color: '#475569' }}>
+                Đóng camera
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

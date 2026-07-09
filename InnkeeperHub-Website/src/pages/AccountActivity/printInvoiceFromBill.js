@@ -295,6 +295,11 @@ export function printInvoiceFromBill({ bill, businessInfo }) {
         <span>Tien dich vu &amp; san pham</span>
         <span>${fmt(bill.service_price)}</span>
       </div>
+      ${bill.discount_amount && bill.discount_amount > 0 ? `
+      <div class="total-row" style="color: #16a34a;">
+        <span>Giam gia (${bill.discount_code || 'Voucher'})</span>
+        <span>-${fmt(bill.discount_amount)}</span>
+      </div>` : ''}
       ${bill.deposit_applied && bill.deposit_amount > 0 ? `
       <div class="total-row">
         <span>Tien coc da tru</span>

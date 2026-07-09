@@ -34,6 +34,9 @@ export function printInvoice({
   serviceTotal,
   grandTotal,
   paymentMethod,
+  discountCode,
+  discountAmount,
+  depositAmount,
   hoursReal,
   minutesReal,
 }) {
@@ -529,6 +532,16 @@ export function printInvoice({
         <span>Tien dich vu &amp; san pham</span>
         <span>${fmt(serviceTotal)}</span>
       </div>
+      ${discountAmount && discountAmount > 0 ? `
+      <div class="total-row" style="color: #16a34a;">
+        <span>Giam gia (${discountCode || 'Voucher'})</span>
+        <span>-${fmt(discountAmount)}</span>
+      </div>` : ''}
+      ${depositAmount && depositAmount > 0 ? `
+      <div class="total-row" style="color: #ca8a04;">
+        <span>Tien coc da tru</span>
+        <span>-${fmt(depositAmount)}</span>
+      </div>` : ''}
       <div class="total-row grand">
         <span>TONG CONG PHAI TRA</span>
         <span class="grand-amount">${fmt(grandTotal)}</span>

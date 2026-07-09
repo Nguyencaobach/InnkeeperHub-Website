@@ -60,7 +60,7 @@ function Discount() {
     setSelectedDiscount(null);
     setFormData({
       code: '', description: '', discount_amount: '',
-      min_order_value: 0, usage_limit: '',
+      min_order_value: 0, usage_limit: '', points_required: '',
       start_date: '', end_date: '', is_active: true,
     });
     setIsEditing(true);
@@ -88,6 +88,13 @@ function Discount() {
       setFormData(prev => ({ ...prev, discount_amount: raw }));
       if (errors.discount_amount) setErrors(prev => ({ ...prev, discount_amount: null }));
     }
+  };
+
+  // Handler chung cho các ô số (không cho nhập chữ/dấu trừ, tự format dấu chấm)
+  const handleNumericChange = (fieldName) => (e) => {
+    const raw = e.target.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+    setFormData(prev => ({ ...prev, [fieldName]: raw }));
+    if (errors[fieldName]) setErrors(prev => ({ ...prev, [fieldName]: null }));
   };
 
   const handleCancel = () => {
@@ -134,6 +141,7 @@ function Discount() {
         is_active: formData.is_active === 'false' || formData.is_active === false ? false : true,
       };
       if (formData.usage_limit) payload.usage_limit = Number(formData.usage_limit);
+      payload.points_required = Number(formData.points_required) || 0;
 
       if (selectedDiscount) {
         await updateDiscountMutation.mutateAsync({ id: selectedDiscount.discount_id, data: payload });
@@ -284,15 +292,23 @@ function Discount() {
                 {/* Điều kiện */}
                 <div className="input-group">
                   <label>Đơn tối thiểu áp dụng (VNĐ)</label>
-                  <input type="number" name="min_order_value" value={formData.min_order_value || ''}
-                    onChange={handleChange} disabled={!isEditing} placeholder="Mặc định: 0đ" />
+                  <input type="text" inputMode="numeric" name="min_order_value"
+                    value={formatNumberInput(formData.min_order_value)}
+                    onChange={handleNumericChange('min_order_value')} disabled={!isEditing} placeholder="Mặc định: 0đ" />
                   {errors.min_order_value && <span className="error-text">{errors.min_order_value}</span>}
                 </div>
                 <div className="input-group">
                   <label>Giới hạn số lần dùng (Tùy chọn)</label>
-                  <input type="number" name="usage_limit" value={formData.usage_limit || ''}
-                    onChange={handleChange} disabled={!isEditing} placeholder="Bỏ trống nếu không giới hạn" />
+                  <input type="text" inputMode="numeric" name="usage_limit"
+                    value={formatNumberInput(formData.usage_limit)}
+                    onChange={handleNumericChange('usage_limit')} disabled={!isEditing} placeholder="Bỏ trống nếu không giới hạn" />
                   {errors.usage_limit && <span className="error-text">{errors.usage_limit}</span>}
+                </div>
+                <div className="input-group">
+                  <label>Điểm cần để đổi</label>
+                  <input type="text" inputMode="numeric" name="points_required"
+                    value={formatNumberInput(formData.points_required)}
+                    onChange={handleNumericChange('points_required')} disabled={!isEditing} placeholder="10.000 quy ra 1 điểm" />
                 </div>
 
                 {/* Mô tả */}

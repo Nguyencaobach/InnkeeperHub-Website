@@ -808,3 +808,144 @@
     z-index: 99999 !important;
   }
 }
+
+/* ══ VOUCHER & TÍCH ĐIỂM ═══════════════════════════════════════ */
+.po-voucher-section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+.po-voucher-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.po-voucher-title i { color: #3b82f6; font-size: 16px; }
+.po-voucher-row { margin-bottom: 4px; }
+.po-voucher-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+.po-voucher-input-wrap {
+  display: flex;
+  gap: 8px;
+}
+.po-voucher-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.po-voucher-input:focus { border-color: #3b82f6; }
+.po-voucher-input--error { border-color: #ef4444 !important; }
+.po-voucher-apply-btn {
+  padding: 9px 16px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.po-voucher-apply-btn:hover { background: #2563eb; }
+.po-voucher-apply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.po-voucher-apply-btn--cam {
+  padding: 9px 12px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+}
+.po-voucher-apply-btn--cam:hover {
+  background: #e2e8f0;
+}
+.po-voucher-error {
+  display: block;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+.po-voucher-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.po-voucher-applied-code {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+}
+.po-voucher-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.po-voucher-remove:hover { color: #ef4444; }
+
+/* Member info card */
+.po-member-info-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.po-member-info-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.po-member-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.po-member-code {
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 1px;
+}
+.po-member-points, .po-member-earn {
+  font-size: 12px;
+  color: #475569;
+}
+
+/* Discount row in summary */
+.po-money-row--discount {
+  background: #f0fdf4;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: 2px -8px;
+}
