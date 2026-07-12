@@ -349,7 +349,7 @@ function PaymentOverview() {
         discount_code:  discountInfo?.code || null,
         final_amount:   grandTotal,
         services_detail: servicesDetail,
-        memberCode:     memberInfo?.member_code || null,
+        memberCode:     memberInfo?.member_code || (memberCode.trim() ? memberCode.trim() : null),
         pointsToEarn:   pointsToEarn > 0 ? pointsToEarn : 0,
       };
 
@@ -797,14 +797,24 @@ function PaymentOverview() {
                     onChange={(e) => { setMemberCode(e.target.value.toUpperCase()); setMemberError(''); }}
                     onKeyDown={(e) => e.key === 'Enter' && handleLookupMember()}
                   />
-                  <button
-                    type="button"
-                    className="po-voucher-apply-btn po-voucher-apply-btn--cam"
-                    onClick={startCamera}
-                    title="Quét barcode bằng camera"
-                  >
-                    <i className="ph-bold ph-camera" />
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      className="po-voucher-apply-btn"
+                      onClick={handleLookupMember}
+                      disabled={isLookingMember || !memberCode.trim()}
+                    >
+                      {isLookingMember ? '...' : 'Kiểm tra'}
+                    </button>
+                    <button
+                      type="button"
+                      className="po-voucher-apply-btn po-voucher-apply-btn--cam"
+                      onClick={startCamera}
+                      title="Quét barcode bằng camera"
+                    >
+                      <i className="ph-bold ph-camera" />
+                    </button>
+                  </div>
                 </div>
               )}
               {memberError && <span className="po-voucher-error">{memberError}</span>}
