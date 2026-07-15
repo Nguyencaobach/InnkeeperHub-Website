@@ -25,6 +25,7 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import NgrokGate from './components/NgrokGate/NgrokGate';
 import ReserveBookingPage from './pages/RoomManagement/ReserveBooking/ReserveBookingPage';
 import CustomerActivityPage from './pages/RoomManagement/CustomerActivity/CustomerActivityPage';
+import RevenueDashboard from './pages/Revenue/Dashboard/RevenueDashboard';
 
 function App() {
   const userData = localStorage.getItem('user');
@@ -43,6 +44,7 @@ function App() {
             {/* --- DASHBOARD: Admin, Manager --- */}
             <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']} />}>
               <Route path="/dashboard" element={<HomePage />} />
+              <Route path="/dashboard/revenue" element={<RevenueDashboard />} />
               <Route path="/dashboard/warehouse-status" element={<WarehouseStatus />} />
             </Route>
 
