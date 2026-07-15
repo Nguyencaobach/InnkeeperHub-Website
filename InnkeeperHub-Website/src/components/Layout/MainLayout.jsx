@@ -152,7 +152,6 @@ function MainLayout() {
               </div>
               <div className={`sub-menu ${openMenu === 'staff-management' ? 'show' : ''}`}>
                 <NavLink to="/staff-management/account" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Cài đặt tài khoản</NavLink>
-                <NavLink to="/staff-management/timekeeping" className={({ isActive }) => isActive ? "sub-item active" : "sub-item"}>Chấm công</NavLink>
               </div>
             </div>
           )}
